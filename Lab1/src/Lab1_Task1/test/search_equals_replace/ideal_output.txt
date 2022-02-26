@@ -1,0 +1,1 @@
+The replacement string is the same as the search string
