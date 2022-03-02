@@ -33,16 +33,14 @@ public class Main {
     private static final String ERROR_ARGUMENT = "1 argument expected <html string>";
 
     public static void main(String[] args) {
-        String html = "&Cat &lt;says&gt; &quot;;Meow&quot;. M&amp;M&apos;s&";//getArgumentOrNull(args);
+        String html = getArgumentOrNull(args);
 
-//        if (html == null) {
-//            System.out.println();
-//            return;
-//        }
+        if (html == null) {
+            System.out.println(ERROR_ARGUMENT);
+            return;
+        }
 
         System.out.println(htmlEncode(html));
-
-
     }
 
     static String getArgumentOrNull(String[] args) {
@@ -58,6 +56,7 @@ public class Main {
 
         for (int i = 0; i < html.length(); i++) {
             char ch = html.charAt(i);
+
             if (ch == '&') {
                 if (!buffer.isEmpty()) {
                     encodedString.append(buffer);
@@ -72,13 +71,14 @@ public class Main {
                 buffer.append(ch);
                 HtmlEntity entity =
                         HtmlEntity.convertToHtmlEntity(buffer.toString());
-                encodedString.append(entity.value);
+                switch (entity) {
+                    case UNKNOWN -> encodedString.append(buffer);
+                    default -> encodedString.append(entity.value);
+                }
                 buffer.setLength(0);
             } else if (buffer.isEmpty()) {
                 encodedString.append(ch);
-            } else {
-                buffer.append(ch);
-            }
+            } else buffer.append(ch);
         }
         encodedString.append(buffer);
 
