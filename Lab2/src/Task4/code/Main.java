@@ -7,29 +7,24 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static final String ENTER_STRING = "Please, enter string:";
-    private final static String ERROR_ARGUMENT = "1 argument expected: <dictionary file path>";
-    private final static String ERROR_FILE = "File not found or incorrect";
-
     public static void main(String[] args) {
+        final String errorArgument = "1 argument expected: <dictionary file path>";
+        final String errorFile = "File not found or incorrect";
 
-        String dictFilePath = getArgumentNull(args);
+        String dictFilePath = args.length == 1 ? args[0] : null;
 
         if (dictFilePath == null) {
-            System.out.println(ERROR_ARGUMENT);
+            System.out.println(errorArgument);
             return;
         }
 
-        Scanner dictionaryScanner = createScannerOrNull(dictFilePath);
+        Scanner dictionaryScanner = getScannerOrNull(dictFilePath);
         if (dictionaryScanner == null) {
-            System.out.println(ERROR_FILE);
+            System.out.println(errorFile);
             return;
         }
 
-        System.out.println(ENTER_STRING);
-        Scanner userInput = new Scanner(System.in);
-        String input = userInput.nextLine();
-        userInput.close();
+        String input = getUserInput();
 
         HashSet<String> badWords = readWordsFrom(dictionaryScanner);
         if (badWords.size() > 0) {
@@ -38,15 +33,17 @@ public class Main {
         } else System.out.println(input);
     }
 
-    private static String getArgumentNull(String[] args) {
-        if (args.length != 1) {
-            return null;
-        } else {
-            return args[0];
-        }
+
+    private static String getUserInput() {
+        final String enterString = "Please, enter string:";
+        System.out.println(enterString);
+        Scanner userInput = new Scanner(System.in);
+        String input = userInput.nextLine();
+        userInput.close();
+        return input;
     }
 
-    private static Scanner createScannerOrNull(String filePath) {
+    private static Scanner getScannerOrNull(String filePath) {
         File file = new File(filePath);
         if (!(file.exists() && file.isFile() && file.canRead())) {
             return null;
@@ -64,13 +61,13 @@ public class Main {
         while (scanner.hasNext()) {
             words.add(scanner.next());
         }
-
         return words;
     }
 
     private static String deleteBadWords(String original, HashSet<String> words) {
         StringBuilder result = new StringBuilder();
         HashSet<String> unifiedWords = new HashSet<>();
+
         for (String word : words) {
             unifiedWords.add(word.toLowerCase());
         }

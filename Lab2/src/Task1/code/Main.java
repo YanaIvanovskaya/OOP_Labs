@@ -5,14 +5,14 @@ import java.util.Vector;
 
 public class Main {
 
-    private static final String ERROR_ARGUMENT =
-            "Invalid sequence: expected <number> <number> <number> ...";
-
     public static void main(String[] args) {
+        final String errorArgument =
+                "Invalid sequence: expected <number> <number> <number> ...";
+
         Vector<Double> doubles = getDoubleVectorOrNull(args);
 
         if (doubles == null) {
-            System.out.println(ERROR_ARGUMENT);
+            System.out.println(errorArgument);
             return;
         }
 
@@ -52,9 +52,7 @@ public class Main {
         double sumOfPositiveNumbers = 0;
 
         for (double num : doubles) {
-            if (num >= 0) {
-                sumOfPositiveNumbers += num;
-            }
+            if (num > 0) sumOfPositiveNumbers += num;
         }
 
         for (int i = 0; i < doubles.size(); i++) {

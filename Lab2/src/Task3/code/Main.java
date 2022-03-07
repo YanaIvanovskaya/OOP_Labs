@@ -8,25 +8,25 @@ import java.util.Scanner;
 
 public class Main {
 
-    private final static String ERROR_ARGUMENT = "1 argument expected: <dictionary file path>";
-    private final static String ERROR_FILE = "File not found or incorrect";
-    private final static String NO_TRANSLATION = "No such translations. Enter translation or empty string for continue";
-
     public static void main(String[] args) {
+
+        final String errorArgument = "1 argument expected: <dictionary file path>";
+        final String errorFile = "File not found or incorrect";
+        final String noTranslation = "No such translations. Enter translation or empty string for continue";
+
         String dictFilePath = "C:\\Users\\yana-\\All_Projects_Intellij_Idea\\OOP_Labs\\Lab2\\src\\Task3\\test\\correct\\input.txt";
-        //getArgumentNull(args);
 
-        if (dictFilePath == null) {
-            System.out.println(ERROR_ARGUMENT);
-            return;
-        }
+//        if (dictFilePath == null) {
+//            System.out.println(errorArgument);
+//            return;
+//        }
 
-        Scanner dictionaryScanner = createScannerOrNull(dictFilePath);
+        Scanner dictionaryScanner = getScannerOrNull(dictFilePath);
         if (dictionaryScanner == null) {
-            System.out.println(ERROR_FILE);
+            System.out.println(errorFile);
             return;
         }
-        HashMap<String, String[]> dictionary = readDictionary(dictionaryScanner);
+        HashMap<String, String[]> dictionary = getDictionary(dictionaryScanner);
 
         System.out.println(dictionary);
 
@@ -42,7 +42,7 @@ public class Main {
                 boolean hasTranslation = dictionary.containsKey(input);
 
                 if (!hasTranslation) {
-                    System.out.println(NO_TRANSLATION);
+                    System.out.println(noTranslation);
                 } else {
                     String[] translations = dictionary.get(input);
                     System.out.println(Arrays.toString(translations));
@@ -51,15 +51,7 @@ public class Main {
         }
     }
 
-    private static String getArgumentNull(String[] args) {
-        if (args.length != 1) {
-            return null;
-        } else {
-            return args[0];
-        }
-    }
-
-    private static Scanner createScannerOrNull(String filePath) {
+    private static Scanner getScannerOrNull(String filePath) {
         File file = new File(filePath);
         if (!(file.exists() && file.isFile() && file.canRead())) {
             return null;
@@ -71,7 +63,7 @@ public class Main {
         }
     }
 
-    private static HashMap<String, String[]> readDictionary(Scanner scanner) {
+    private static HashMap<String, String[]> getDictionary(Scanner scanner) {
         HashMap<String, String[]> dictionary = new HashMap<>();
 
         while (scanner.hasNextLine()) {

@@ -10,18 +10,16 @@ enum HtmlEntity {
     UNKNOWN("", "");
 
     final String value;
-    final String representation;
+    private final String representation;
 
     HtmlEntity(String value, String representation) {
         this.value = value;
         this.representation = representation;
     }
 
-    static HtmlEntity convertToHtmlEntity(String value) {
+    static HtmlEntity fromString(String value) {
         for (HtmlEntity entity : values()) {
-            if (value.equals(entity.representation)) {
-                return entity;
-            }
+            if (value.equals(entity.representation)) return entity;
         }
         return HtmlEntity.UNKNOWN;
     }
@@ -30,24 +28,17 @@ enum HtmlEntity {
 
 public class Main {
 
-    private static final String ERROR_ARGUMENT = "1 argument expected <html string>";
-
     public static void main(String[] args) {
-        String html = getArgumentOrNull(args);
+        final String errorArgument = "1 argument expected <html string>";
+
+        String html = args.length == 1 ? args[0] : null;
 
         if (html == null) {
-            System.out.println(ERROR_ARGUMENT);
+            System.out.println(errorArgument);
             return;
         }
 
         System.out.println(htmlEncode(html));
-    }
-
-    static String getArgumentOrNull(String[] args) {
-        if (args.length != 1) {
-            return null;
-        }
-        return args[0];
     }
 
     static String htmlEncode(String html) {
@@ -56,32 +47,31 @@ public class Main {
 
         for (int i = 0; i < html.length(); i++) {
             char ch = html.charAt(i);
+            boolean isEndOfEntity = ch == ';';
+            boolean isNotPartOfEntity = isEndOfEntity && buffer.isEmpty();
+            boolean isLastPartOfEntity = isEndOfEntity && !buffer.isEmpty();
 
             if (ch == '&') {
-                if (!buffer.isEmpty()) {
-                    encodedString.append(buffer);
-                    buffer.setLength(0);
-                }
+                encodedString.append(buffer);
+                buffer.setLength(0);
                 buffer.append(ch);
-            } else if (ch == ';') {
-                if (buffer.isEmpty()) {
-                    encodedString.append(ch);
-                    continue;
-                }
+            } else if (isNotPartOfEntity) {
+                encodedString.append(ch);
+            } else if (isLastPartOfEntity) {
                 buffer.append(ch);
-                HtmlEntity entity =
-                        HtmlEntity.convertToHtmlEntity(buffer.toString());
+                HtmlEntity entity = HtmlEntity.fromString(buffer.toString());
                 switch (entity) {
                     case UNKNOWN -> encodedString.append(buffer);
                     default -> encodedString.append(entity.value);
                 }
                 buffer.setLength(0);
-            } else if (buffer.isEmpty()) {
-                encodedString.append(ch);
-            } else buffer.append(ch);
+            } else {
+                if (buffer.isEmpty()) encodedString.append(ch);
+                else buffer.append(ch);
+            }
         }
-        encodedString.append(buffer);
 
+        encodedString.append(buffer);
         return encodedString.toString();
     }
 
