@@ -2,23 +2,22 @@ package Lab1_Task2.code;
 
 public class Bin2Dec {
 
-    private static final String ERROR_ARGUMENT = "1 argument expected <bin number>";
-    private static final String ERROR_NUMBER = "Bin number is incorrect - expected <= 32 bit";
-
     public static void main(String[] args) {
-        String binNumber = getArgumentOrNull(args);
+        final String errorArgument = "1 argument expected <bin number>";
+        final String errorNumber = "Bin number is incorrect - expected <= 32 bit";
+
+        String binNumber = args.length != 1 ? null : args[0];
 
         if (binNumber == null) {
-            System.out.println(ERROR_ARGUMENT);
+            System.out.println(errorArgument);
             return;
         }
 
-        if (!isValidBinNumber(binNumber)) {
-            System.out.println(ERROR_NUMBER);
-            return;
+        if (isIncorrectBinNumber(binNumber)) {
+            System.out.println(errorNumber);
+        } else {
+            System.out.println(convertToDecNumber(binNumber));
         }
-
-        System.out.println(convertToDecNumber(binNumber));
     }
 
     static int convertToDecNumber(String binNumber) {
@@ -44,27 +43,19 @@ public class Bin2Dec {
         return result;
     }
 
-
-    static String getArgumentOrNull(String[] args) {
-        if (args.length != 1) {
-            return null;
-        }
-        return args[0];
-    }
-
-    static boolean isValidBinNumber(String number) {
+    static boolean isIncorrectBinNumber(String number) {
         boolean is32bitOrLess = number.length() <= 32;
         boolean isCorrect = true;
 
         for (int i = 0; i < number.length(); i++) {
             char digit = number.charAt(i);
-            if (!(digit == '1' || digit == '0')) {
+            if (digit != '1' && digit != '0') {
                 isCorrect = false;
                 break;
             }
         }
 
-        return is32bitOrLess && isCorrect;
+        return !(is32bitOrLess && isCorrect);
     }
 
 }

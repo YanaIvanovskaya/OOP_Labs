@@ -1,65 +1,88 @@
 package Task3.code;
 
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Scanner;
 
 public class Main {
 
-    //Вариант 4 – Генератор простых чисел – 100 баллов
-    //Разработайте функцию std::set<int> GeneratePrimeNumbersSet(int upperBound),
-    // возвращающую множество всех простых чисел, не превышающих значения upperBound.
-    //С ее использованием разработайте программу, выводящую в стандартный поток вывода
-    // элементы множества простых чисел, не превышающие значения, переданного приложению
-    // через обязательный параметр командной строки.
-    //Максимальное значение верхней границы множества принять равным 100 миллионам.
-    //Время построения множества простых чисел в указанном диапазоне на компьютере с
-    // 2GHz-процессором не должно превышать 10-12 секунд (программа будет запускаться в Release-конфигурации).
-    //Примечание: наивный поиск простых чисел не позволит добиться указанной производительности.
-    // Используйте «Решето Эратосфена». Для предварительного просеивания воспользуйтесь vector<bool>
-    // (для хранения каждого элемента он использует 1 бит информации, т.к. на хранение признака простоты
-    // 100 миллионов чисел потребуется всего 12,5 мегабайт памяти)
-    //Для проверки программы используйте тот факт, что в диапазоне от 1 до 100000000 содержится 5761455
-    // простых чисел.
+    private final static String ERROR_ARGUMENT = "1 argument expected: <dictionary file path>";
+    private final static String ERROR_FILE = "File not found or incorrect";
+    private final static String NO_TRANSLATION = "No such translations. Enter translation or empty string for continue";
 
     public static void main(String[] args) {
+        String dictFilePath = "C:\\Users\\yana-\\All_Projects_Intellij_Idea\\OOP_Labs\\Lab2\\src\\Task3\\test\\correct\\input.txt";
+        //getArgumentNull(args);
 
-        int upperBound = 100000000;
-//        HashSet<Integer> primes = generatePrimeNumbersSet(upperBound);
-//        System.out.println(primes);
-    }
-
-    private static HashSet<Integer> generatePrimeNumbersSet(int upperBound) {
-        long startTime = System.currentTimeMillis();
-        HashSet<Integer> primes = new HashSet<>();
-        List<Integer> list = new ArrayList<>(upperBound);
-
-        for (int i = 2; i <= upperBound; i++) {
-            list.add(i);
+        if (dictFilePath == null) {
+            System.out.println(ERROR_ARGUMENT);
+            return;
         }
 
-        int counter = 2;
-        int deletedNumbers = 1;
+        Scanner dictionaryScanner = createScannerOrNull(dictFilePath);
+        if (dictionaryScanner == null) {
+            System.out.println(ERROR_FILE);
+            return;
+        }
+        HashMap<String, String[]> dictionary = readDictionary(dictionaryScanner);
 
-        Iterator<Integer> iter = list.iterator();
-        while (deletedNumbers > 0) {
-            deletedNumbers = 0;
-            System.out.println(counter);
-            while (iter.hasNext()) {
-                int number = iter.next();
-                if (number % counter == 0 && number != counter) {
-                    list.set(list.indexOf(number), null);
-                    System.out.println(number);
-                    deletedNumbers++;
+        System.out.println(dictionary);
+
+        Scanner userInput = new Scanner(System.in);
+
+        while (userInput.hasNextLine()) {
+            String input = userInput.next();
+            if (input.equals("...")) {
+                System.out.println("Goodbye");
+                userInput.close();
+                break;
+            } else {
+                boolean hasTranslation = dictionary.containsKey(input);
+
+                if (!hasTranslation) {
+                    System.out.println(NO_TRANSLATION);
+                } else {
+                    String[] translations = dictionary.get(input);
+                    System.out.println(Arrays.toString(translations));
                 }
             }
-            counter++;
         }
-        list = list.stream().filter(Objects::nonNull).toList();
-        System.out.println(list);
-        assert list.size() == 5761455;
-        long sec = (System.currentTimeMillis() - startTime) / 1000;
-        System.out.println("Time: " + sec);
-        return primes;
     }
 
+    private static String getArgumentNull(String[] args) {
+        if (args.length != 1) {
+            return null;
+        } else {
+            return args[0];
+        }
+    }
+
+    private static Scanner createScannerOrNull(String filePath) {
+        File file = new File(filePath);
+        if (!(file.exists() && file.isFile() && file.canRead())) {
+            return null;
+        }
+        try {
+            return new Scanner(file);
+        } catch (IOException ex) {
+            return null;
+        }
+    }
+
+    private static HashMap<String, String[]> readDictionary(Scanner scanner) {
+        HashMap<String, String[]> dictionary = new HashMap<>();
+
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            String[] translate = line.split(" ");
+            if (translate.length >= 2) {
+                dictionary.put(translate[0], Arrays.copyOfRange(translate, 1, translate.length));
+            }
+        }
+
+        return dictionary;
+    }
 
 }

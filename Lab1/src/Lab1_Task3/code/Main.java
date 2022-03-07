@@ -9,36 +9,41 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static final String ERROR_ARGUMENT = "1 argument expected: <input file path>";
-    private static final String ERROR_FILE = "File is not correct";
-    private static final String ERROR_MATRIX = "Matrix in file must be of size 3x3 and contain only numeric values";
-    private static final String CAN_NOT_BE_INVERTED = "Matrix can not be inverted because its determinant is 0";
-
     public static void main(String[] args) {
-        File input = getInputFileOrNull(args);
+        final String errorArgument = "1 argument expected: <input file path>";
+        final String errorFile = "File is not correct";
+
+        File input = args.length != 1 ? null : new File(args[0]);
 
         if (input == null) {
-            System.out.println(ERROR_ARGUMENT);
-            return;
-        }
-        if (!input.exists() || !input.isFile() || !input.canRead()) {
-            System.out.println(ERROR_FILE);
+            System.out.println(errorArgument);
             return;
         }
 
+        boolean isValidFile = input.exists() && input.isFile() && input.canRead();
+        if (!isValidFile) {
+            System.out.println(errorFile);
+        } else {
+            invertMatrixFrom(input);
+        }
+    }
+
+    static void invertMatrixFrom(File input) {
+        final String errorMatrix =
+                "Matrix in file must be of size 3x3 and contain only numeric values";
+        final String canNotBeInverted =
+                "Matrix can not be inverted because its determinant is 0";
         double[][] originalMatrix = readMatrixFromFile(input);
 
-        if (isMatrixValid(originalMatrix)) {
-            double[][] result = MatrixInverter.invertOrNull(originalMatrix);
+        try {
+            double[][] result = Matrix3x3Inverter.invertOrNull(originalMatrix);
             if (result == null) {
-                System.out.println(CAN_NOT_BE_INVERTED);
-                return;
-            }
-            if (MatrixInverter.isCorrectInverted(originalMatrix, result)) {
+                System.out.println(canNotBeInverted);
+            } else {
                 printMatrix(result);
             }
-        } else {
-            System.out.println(ERROR_MATRIX);
+        } catch (IllegalArgumentException ex) {
+            System.out.println(errorMatrix);
         }
     }
 
@@ -47,25 +52,21 @@ public class Main {
         for (double[] doubles : matrix) {
             for (int column = 0; column < matrix.length; column++) {
                 System.out.print(formatter.format(doubles[column]));
-                System.out.print(" ");
+                if (column < matrix.length - 1) {
+                    System.out.print(" ");
+                }
             }
             System.out.print("\n");
         }
     }
 
-    static File getInputFileOrNull(String[] args) {
-        if (args.length != 1) return null;
-        else return new File(args[0]);
-    }
-
     static double[][] readMatrixFromFile(File input) {
-        double[][] originalMatrix = new double[4][];
+        double[][] originalMatrix = new double[3][];
         int rowCounter = 0;
 
         try (Scanner scanner = new Scanner(input)) {
-            while (scanner.hasNextLine()) {
+            while (scanner.hasNextLine() && rowCounter < 3) {
                 String newRow = scanner.nextLine().trim();
-                if (rowCounter == 4 || newRow.isEmpty()) break;
                 originalMatrix[rowCounter] = convertToDoubleArrayOrNull(newRow.split(" "));
                 rowCounter++;
             }
@@ -75,14 +76,6 @@ public class Main {
         }
 
         return originalMatrix;
-    }
-
-    static boolean isMatrixValid(double[][] matrix) {
-        boolean isRowSizeCorrect = matrix[3] == null;
-        boolean isFirstRowCorrect = matrix[0] != null && matrix[0].length == 3;
-        boolean isSecondRowCorrect = matrix[1] != null && matrix[1].length == 3;
-        boolean isThirdRowCorrect = matrix[2] != null && matrix[2].length == 3;
-        return isRowSizeCorrect && isFirstRowCorrect && isSecondRowCorrect && isThirdRowCorrect;
     }
 
     static double[] convertToDoubleArrayOrNull(String[] stringArray) {
@@ -104,9 +97,9 @@ public class Main {
 
 }
 
-final class MatrixInverter {
+final class Matrix3x3Inverter {
 
-    private MatrixInverter() {
+    private Matrix3x3Inverter() {
     }
 
     private static final double[][] E = {
@@ -117,7 +110,11 @@ final class MatrixInverter {
 
     private static final int MATRIX_SIZE = 3;
 
-    static double[][] invertOrNull(double[][] matrix) {
+    static double[][] invertOrNull(double[][] matrix) throws IllegalArgumentException {
+        if (matrix == null || !isMatrixValid(matrix)) {
+            throw new IllegalArgumentException("Matrix is incorrect");
+        }
+
         double determinant = find3xDeterminant(matrix);
         if (determinant == 0) {
             return null;
@@ -134,7 +131,15 @@ final class MatrixInverter {
             }
         }
 
-        return invertedMatrix;
+        return isCorrectInverted(matrix, invertedMatrix) ? invertedMatrix : null;
+    }
+
+    private static boolean isMatrixValid(double[][] matrix) {
+        boolean isRowSizeCorrect = matrix.length == MATRIX_SIZE;
+        boolean isFirstRowCorrect = matrix[0] != null && matrix[0].length == MATRIX_SIZE;
+        boolean isSecondRowCorrect = matrix[1] != null && matrix[1].length == MATRIX_SIZE;
+        boolean isThirdRowCorrect = matrix[2] != null && matrix[2].length == MATRIX_SIZE;
+        return isRowSizeCorrect && isFirstRowCorrect && isSecondRowCorrect && isThirdRowCorrect;
     }
 
     private static double find3xDeterminant(double[][] matrix) {
@@ -203,14 +208,14 @@ final class MatrixInverter {
                 - (matrix[0][1] * matrix[1][0]);
     }
 
-    static boolean isCorrectInverted(
+    private static boolean isCorrectInverted(
             double[][] originalMatrix,
             double[][] invertedMatrix
     ) {
         double[][] result = new double[MATRIX_SIZE][MATRIX_SIZE];
         for (int row = 0; row < MATRIX_SIZE; row++) {
             for (int column = 0; column < MATRIX_SIZE; column++) {
-                result[row][column] = (int) (
+                result[row][column] = Math.round(
                         (originalMatrix[row][0] *
                                 invertedMatrix[0][column])
 

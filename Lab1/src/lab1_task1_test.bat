@@ -5,17 +5,9 @@ set OUT = "out.txt"
 javac "%__CD__%Lab1_Task1\code\Main.java"
 
 
-::case 13 -> Search contains whitespaces
+::case 11 -> Search contains whitespaces
 java Lab1_Task1.code.Main "%__CD__%Lab1_Task1/test/search_contains_whitespaces/input.txt" "%__CD__%Lab1_Task1/test/search_contains_whitespaces/output.txt" "and also" "REPLACED" > OUT || goto err
 fc OUT "%__CD__%Lab1_Task1/test/search_contains_whitespaces/ideal_output.txt"  || goto err
-
-::case 12 -> Many lines search
-java Lab1_Task1.code.Main "%__CD__%Lab1_Task1/test/correct/input.txt" "%__CD__%Lab1_Task1/test/many_lines_search/output.txt" "If we wish to define the technology, in simple terms one may consider it as the knowledge and usage of tools, crafts, systems, methods and techniques of the organization to resolve the problem." "REPLACED" > OUT || goto err
-fc OUT "%__CD__%Lab1_Task1/test/many_lines_search/ideal_output.txt" || goto err
-
-::case 11 -> Search has breaks
-java Lab1_Task1.code.Main "%__CD__%Lab1_Task1/test/correct/input.txt" "%__CD__%Lab1_Task1/test/search_has_breaks/output.txt" "tools, crafts" "REPLACED" > OUT || goto err
-fc OUT "%__CD__%Lab1_Task1/test/search_has_breaks/ideal_output.txt" || goto err
 
 ::case 10 -> Search equals replace
 java Lab1_Task1.code.Main "%__CD__%Lab1_Task1/test/correct/input.txt" "%__CD__%Lab1_Task1/test/correct/output.txt" "and" "and" > OUT || goto err
