@@ -21,60 +21,60 @@ public class Main {
 //            return;
 //        }
 
-        Scanner dictionaryScanner = getScannerOrNull(dictFilePath);
-        if (dictionaryScanner == null) {
-            System.out.println(errorFile);
-            return;
-        }
-        HashMap<String, String[]> dictionary = getDictionary(dictionaryScanner);
-
-        System.out.println(dictionary);
-
-        Scanner userInput = new Scanner(System.in);
-
-        while (userInput.hasNextLine()) {
-            String input = userInput.next();
-            if (input.equals("...")) {
-                System.out.println("Goodbye");
-                userInput.close();
-                break;
-            } else {
-                boolean hasTranslation = dictionary.containsKey(input);
-
-                if (!hasTranslation) {
-                    System.out.println(noTranslation);
-                } else {
-                    String[] translations = dictionary.get(input);
-                    System.out.println(Arrays.toString(translations));
-                }
-            }
-        }
+//        Scanner dictionaryScanner = getScannerOrNull(dictFilePath);
+//        if (dictionaryScanner == null) {
+//            System.out.println(errorFile);
+//            return;
+//        }
+//        HashMap<String, String[]> dictionary = getDictionary(dictionaryScanner);
+//
+//        System.out.println(dictionary);
+//
+//        Scanner userInput = new Scanner(System.in);
+//
+//        while (userInput.hasNextLine()) {
+//            String input = userInput.next();
+//            if (input.equals("...")) {
+//                System.out.println("Goodbye");
+//                userInput.close();
+//                break;
+//            } else {
+//                boolean hasTranslation = dictionary.containsKey(input);
+//
+//                if (!hasTranslation) {
+//                    System.out.println(noTranslation);
+//                } else {
+//                    String[] translations = dictionary.get(input);
+//                    System.out.println(Arrays.toString(translations));
+//                }
+//            }
+//        }
     }
-
-    private static Scanner getScannerOrNull(String filePath) {
-        File file = new File(filePath);
-        if (!(file.exists() && file.isFile() && file.canRead())) {
-            return null;
-        }
-        try {
-            return new Scanner(file);
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
-    private static HashMap<String, String[]> getDictionary(Scanner scanner) {
-        HashMap<String, String[]> dictionary = new HashMap<>();
-
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            String[] translate = line.split(" ");
-            if (translate.length >= 2) {
-                dictionary.put(translate[0], Arrays.copyOfRange(translate, 1, translate.length));
-            }
-        }
-
-        return dictionary;
-    }
+//
+//    private static Scanner getScannerOrNull(String filePath) {
+//        File file = new File(filePath);
+//        if (!(file.exists() && file.isFile() && file.canRead())) {
+//            return null;
+//        }
+//        try {
+//            return new Scanner(file);
+//        } catch (IOException ex) {
+//            return null;
+//        }
+//    }
+//
+//    private static HashMap<String, String[]> getDictionary(Scanner scanner) {
+//        HashMap<String, String[]> dictionary = new HashMap<>();
+//
+//        while (scanner.hasNextLine()) {
+//            String line = scanner.nextLine();
+//            String[] translate = line.split(" ");
+//            if (translate.length >= 2) {
+//                dictionary.put(translate[0], Arrays.copyOfRange(translate, 1, translate.length));
+//            }
+//        }
+//
+//        return dictionary;
+//    }
 
 }

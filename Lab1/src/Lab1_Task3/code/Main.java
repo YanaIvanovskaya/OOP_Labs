@@ -4,14 +4,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
         final String errorArgument = "1 argument expected: <input file path>";
-        final String errorFile = "File is not correct";
 
         File input = args.length != 1 ? null : new File(args[0]);
 
@@ -20,28 +18,25 @@ public class Main {
             return;
         }
 
-        boolean isValidFile = input.exists() && input.isFile() && input.canRead();
-        if (!isValidFile) {
-            System.out.println(errorFile);
-        } else {
-            invertMatrixFrom(input);
-        }
+        invertMatrixFrom(input);
     }
 
     static void invertMatrixFrom(File input) {
+        final String errorFile = "File is not correct";
         final String errorMatrix =
                 "Matrix in file must be of size 3x3 and contain only numeric values";
         final String canNotBeInverted =
                 "Matrix can not be inverted because its determinant is 0";
-        double[][] originalMatrix = readMatrixFromFile(input);
 
         try {
+            double[][] originalMatrix = readMatrixFromFile(input);
             double[][] result = Matrix3x3Inverter.invertOrNull(originalMatrix);
-            if (result == null) {
-                System.out.println(canNotBeInverted);
-            } else {
-                printMatrix(result);
-            }
+
+            if (result == null) System.out.println(canNotBeInverted);
+            else printMatrix(result);
+
+        } catch (FileNotFoundException ex) {
+            System.out.println(errorFile);
         } catch (IllegalArgumentException ex) {
             System.out.println(errorMatrix);
         }
@@ -60,7 +55,7 @@ public class Main {
         }
     }
 
-    static double[][] readMatrixFromFile(File input) {
+    static double[][] readMatrixFromFile(File input) throws FileNotFoundException {
         double[][] originalMatrix = new double[3][];
         int rowCounter = 0;
 
@@ -70,9 +65,6 @@ public class Main {
                 originalMatrix[rowCounter] = convertToDoubleArrayOrNull(newRow.split(" "));
                 rowCounter++;
             }
-
-        } catch (NoSuchElementException | FileNotFoundException ex) {
-            ex.printStackTrace();
         }
 
         return originalMatrix;

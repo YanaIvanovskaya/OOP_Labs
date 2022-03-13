@@ -1,12 +1,14 @@
 @echo off
 
-set OUT = "out.txt"
+set OUT="%TEMP%\out.txt"
+
+set TEST_DIR=%~dp0Task3\test
 
 javac "%__CD__%Task3\code\Main.java"
 
 ::case 0 -> All correct
-java Task3.code.Main "%__CD__%Task3/test/correct/input.txt" > OUT || goto err
-fc OUT "%__CD__%Task3/test/correct/output.txt"  || goto err
+java Task3.code.Main "%TEST_DIR%\correct\input.txt" >%OUT% || goto err
+fc %OUT% "%TEST_DIR%\correct\output.txt"  || goto err
 
 
 echo ALL TESTS PASSED

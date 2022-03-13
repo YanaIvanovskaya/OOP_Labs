@@ -33,7 +33,6 @@ public class Main {
         } else System.out.println(input);
     }
 
-
     private static String getUserInput() {
         final String enterString = "Please, enter string:";
         System.out.println(enterString);

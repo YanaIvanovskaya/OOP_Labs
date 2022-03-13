@@ -1,6 +1,7 @@
 package Lab1_Task1.code;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
@@ -11,71 +12,55 @@ public class Main {
         final int argsCount = 4;
         final String errorArguments =
                 "4 arguments expected: <input file> <output file> <search> <replace>";
-        final String errorSearchAndReplaceEquals =
-                "The replacement string is the same as the search string";
-
-        String inputPath;
-        String outputPath;
-        String search;
-        String replace;
 
         if (args.length != argsCount) {
             System.out.println(errorArguments);
             return;
-        } else {
-            inputPath = args[0];
-            outputPath = args[1];
-            search = args[2];
-            replace = args[3];
         }
-        if (search.equals(replace)) {
-            System.out.println(errorSearchAndReplaceEquals);
-            return;
+
+        String inputPath = args[0];
+        String outputPath = args[1];
+        String search = args[2];
+        String replace = args[3];
+
+        try {
+            readAndReplace(inputPath, outputPath, search, replace);
+        } catch (FileNotFoundException ex) {
+            System.out.println(ex.getMessage());
         }
+    }
+
+    private static void readAndReplace(
+            String inputPath,
+            String outputPath,
+            String search,
+            String replace
+    ) throws FileNotFoundException {
+        String newLine;
+        String replacedLine;
 
         Scanner scanner = getScannerOrNull(inputPath);
         FileWriter writer = getFileWriterOrNull(outputPath);
 
         if (scanner == null) {
-            System.out.println(getFileErrorMessage(inputPath));
+            throw new FileNotFoundException(getFileErrorMessage(inputPath));
         }
         if (writer == null) {
-            System.out.println(getFileErrorMessage(outputPath));
+            throw new FileNotFoundException(getFileErrorMessage(outputPath));
         }
-
-        if (scanner != null && writer != null) {
-            readAndReplace(scanner, writer, search, replace);
-        }
-    }
-
-    private static void readAndReplace(Scanner scanner, FileWriter writer, String search, String replace) {
-        String newLine;
-        String preparedLine;
 
         try (scanner) {
-            while (scanner.hasNextLine()) {
-                newLine = scanner.nextLine();
-                preparedLine = newLine.replaceAll(search, replace);
-                if (scanner.hasNextLine()) {
-                    preparedLine += " ";
+            try (writer) {
+                while (scanner.hasNextLine()) {
+                    newLine = scanner.nextLine();
+                    replacedLine = newLine.replaceAll(search, replace);
+                    if (scanner.hasNextLine()) {
+                        replacedLine += " ";
+                    }
+                    writer.write(replacedLine);
                 }
-                write(writer, preparedLine);
+            } catch (IOException ignored) {
             }
-            writer.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    private static void write(FileWriter writer, String line) throws IOException {
-        if (line.isEmpty()) return;
-
-        try {
-            writer.write(line);
-            System.out.print(line);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            writer.close();
         }
     }
 
