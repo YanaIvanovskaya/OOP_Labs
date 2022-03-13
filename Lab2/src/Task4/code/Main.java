@@ -1,15 +1,17 @@
 package Task4.code;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Scanner;
 
+// Task 4 - Вариант 3 – Фильтр нецензурных слов – 60 баллов
 public class Main {
 
     public static void main(String[] args) {
         final String errorArgument = "1 argument expected: <dictionary file path>";
-        final String errorFile = "File not found or incorrect";
+        final String enterString = "Please, enter not empty string:";
 
         String dictFilePath = args.length == 1 ? args[0] : null;
 
@@ -18,28 +20,26 @@ public class Main {
             return;
         }
 
-        Scanner dictionaryScanner = getScannerOrNull(dictFilePath);
-        if (dictionaryScanner == null) {
-            System.out.println(errorFile);
-            return;
+        HashSet<String> badWords = new HashSet<>();
+        try {
+            badWords = readWordsFrom(dictFilePath);
+        } catch (FileNotFoundException ex) {
+            System.out.println(ex.getMessage());
         }
 
-        String input = getUserInput();
-
-        HashSet<String> badWords = readWordsFrom(dictionaryScanner);
-        if (badWords.size() > 0) {
-            String goodString = deleteBadWords(input, badWords);
-            System.out.println(goodString);
-        } else System.out.println(input);
-    }
-
-    private static String getUserInput() {
-        final String enterString = "Please, enter string:";
         System.out.println(enterString);
-        Scanner userInput = new Scanner(System.in);
-        String input = userInput.nextLine();
-        userInput.close();
-        return input;
+        boolean isInterrupted = false;
+        try (Scanner userInput = new Scanner(System.in)) {
+            while (!isInterrupted) {
+                String input = userInput.nextLine();
+                if (input.trim().isEmpty()) {
+                    isInterrupted = true;
+                } else {
+                    String goodString = deleteBadWords(input, badWords);
+                    System.out.println(goodString);
+                }
+            }
+        }
     }
 
     private static Scanner getScannerOrNull(String filePath) {
@@ -54,12 +54,22 @@ public class Main {
         }
     }
 
-    private static HashSet<String> readWordsFrom(Scanner scanner) {
+    private static HashSet<String> readWordsFrom(String dictFilePath) throws FileNotFoundException {
+        final String errorFile = "File not found or incorrect";
+        Scanner dictionaryScanner = getScannerOrNull(dictFilePath);
+
+        if (dictionaryScanner == null) {
+            throw new FileNotFoundException(errorFile);
+        }
+
         HashSet<String> words = new HashSet<>();
 
-        while (scanner.hasNext()) {
-            words.add(scanner.next());
+        try (dictionaryScanner) {
+            while (dictionaryScanner.hasNext()) {
+                words.add(dictionaryScanner.next());
+            }
         }
+
         return words;
     }
 

@@ -3,6 +3,8 @@ package Task1.code;
 import java.text.DecimalFormat;
 import java.util.Vector;
 
+// Task 1 - Вариант 8 - Элементы, стоящие на четных позициях массива умножить на 2,
+// а из элементов, стоящих на нечетных позициях, вычесть сумму всех неотрицательных элементов
 public class Main {
 
     public static void main(String[] args) {
@@ -13,11 +15,10 @@ public class Main {
 
         if (doubles == null) {
             System.out.println(errorArgument);
-            return;
+        } else {
+            Vector<Double> result = transformAs8Variant(doubles);
+            printResult(result);
         }
-
-        Vector<Double> result = transformAs8Variant(doubles);
-        printResult(result);
     }
 
     private static void printResult(Vector<Double> doubles) {

@@ -26,6 +26,7 @@ enum HtmlEntity {
 
 }
 
+// Task 2 - Вариант 5 – HTML Decode – 60 баллов
 public class Main {
 
     public static void main(String[] args) {
