@@ -1,31 +1,10 @@
 package Task5.code;
 
+import java.net.MalformedURLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-enum Protocol {
-    HTTP("http"),
-    HTTPS("https"),
-    FTP("ftp");
-
-    final String value;
-
-    Protocol(String value) {
-        this.value = value;
-    }
-
-    static String getProtocolRegex() {
-        StringBuilder regex = new StringBuilder("(");
-        int len = values().length;
-        for (Protocol protocol : values()) {
-            boolean isLastElement = protocol == values()[len - 1];
-            regex.append(protocol.value)
-                    .append(isLastElement ? ")" : "|");
-        }
-        return regex.toString();
-    }
-}
-
+// Task 5 - Вариант 1 – парсер URL-ов – 80 баллов
 public class Main {
     public static void main(String[] args) {
 
@@ -41,49 +20,75 @@ public class Main {
 //        }
 
         String url = "http://qwerty-123.ru:62222/document/123/234";
-        System.out.println(parseUrl(url));
+        try {
+            System.out.println(UrlMatcher.getUrlInfo(url));
+        } catch (MalformedURLException ex) {
+            System.out.println("not url");
+        }
     }
 
-    static boolean parseUrl(
-            String url
-    ) {
-        String protocolRegex = Protocol.getProtocolRegex();
-        String hostRegex = "(\\w|[.-])+";
-        String portRegex = "((:(" + getPortNumberRegex() + "))|)";
-        String documentRegex = "((/(.)+)|)";
-        String urlRegex = protocolRegex + "://" + hostRegex + portRegex + documentRegex;
+}
 
+final class UrlMatcher {
+
+    private static final String protocolRegex = Protocol.getProtocolRegex();
+    private static final String hostRegex = "(\\w|[.-])+";
+    private static final String portRegex = "(:(" + getPortNumberRegex() + "))";
+    private static final String documentRegex = "(/(.)+)";
+
+    private UrlMatcher() {
+    }
+
+    static boolean parseUrl(String url) {
+        String urlRegex = protocolRegex + "://" + hostRegex +
+                "(" + portRegex + "|)" +
+                "(" + documentRegex + "|)";
+        return url.matches(urlRegex);
+    }
+
+    static String getUrlInfo(String url) throws MalformedURLException {
+        if (!parseUrl(url)) {
+            throw new MalformedURLException();
+        }
+        StringBuilder urlInfo = new StringBuilder(url).append("\n");
+        String protocol = "";
         int startIndex = 0;
+
         Matcher protocolMatcher = Pattern.compile(protocolRegex).matcher(url);
         if (protocolMatcher.find()) {
-            System.out.println(" protocolRegex: " + protocolMatcher.group());
+            protocol = protocolMatcher.group();
+            urlInfo.append("PROTOCOL: ")
+                    .append(protocol)
+                    .append("\n");
             startIndex = protocolMatcher.end();
         }
 
         Matcher hostMatcher = Pattern.compile(hostRegex).matcher(url);
         if (hostMatcher.find(startIndex)) {
-            System.out.println(" hostRegex: " + hostMatcher.group());
+            urlInfo.append("HOST: ")
+                    .append(hostMatcher.group())
+                    .append("\n");
             startIndex = hostMatcher.end();
         }
 
         Matcher portMatcher = Pattern.compile(portRegex).matcher(url);
-        while (portMatcher.find(startIndex)) {
-            if (!portMatcher.group().isEmpty()) {
-                System.out.println(" portRegex: " + portMatcher.group());
-                startIndex = portMatcher.end();
-                break;
-            }
+        String port = portMatcher.find(startIndex) ? portMatcher.group().substring(1) :
+                String.valueOf(Protocol.fromString(protocol).port);
+        if (portMatcher.find(startIndex)) {
+            urlInfo.append("PORT: ")
+                    .append(port)
+                    .append("\n");
+            startIndex = portMatcher.end();
         }
 
         Matcher docMatcher = Pattern.compile(documentRegex).matcher(url);
-        while (docMatcher.find(startIndex)) {
-            if (!docMatcher.group().isEmpty()) {
-                System.out.println(" documentRegex: " + docMatcher.group());
-                break;
-            }
+        if (docMatcher.find(startIndex)) {
+            urlInfo.append("DOC: ")
+                    .append(docMatcher.group())
+                    .append("\n");
         }
 
-        return url.matches(urlRegex);
+        return urlInfo.toString();
     }
 
     private static String getPortNumberRegex() {
@@ -118,6 +123,43 @@ public class Main {
                 num10_99 +
                 or +
                 num1_9;
+    }
+
+}
+
+enum Protocol {
+    HTTP("http", 80),
+    HTTPS("https", 443),
+    FTP("ftp", 21),
+    UNKNOWN("", 0);
+
+    final String value;
+    final int port;
+
+    Protocol(String value, int port) {
+        this.value = value;
+        this.port = port;
+    }
+
+    static String getProtocolRegex() {
+        StringBuilder regex = new StringBuilder("(");
+        String or = "|";
+        int len = values().length;
+
+        for (Protocol protocol : values()) {
+            boolean isLastElement = protocol == values()[len - 1];
+            regex.append(protocol.value).append(or)
+                    .append(protocol.value.toUpperCase())
+                    .append(isLastElement ? ")" : or);
+        }
+        return regex.toString();
+    }
+
+    static Protocol fromString(String str) {
+        for (Protocol protocol : values()) {
+            if (protocol.value.equals(str.toLowerCase())) return protocol;
+        }
+        return Protocol.UNKNOWN;
     }
 
 }

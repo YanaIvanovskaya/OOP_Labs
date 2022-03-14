@@ -5,7 +5,7 @@ import java.util.Vector;
 
 // Task 1 - Вариант 8 - Элементы, стоящие на четных позициях массива умножить на 2,
 // а из элементов, стоящих на нечетных позициях, вычесть сумму всех неотрицательных элементов
-public class Main {
+public class Task1 {
 
     public static void main(String[] args) {
         final String errorArgument =
@@ -32,7 +32,7 @@ public class Main {
         }
     }
 
-    private static Vector<Double> getDoubleVectorOrNull(String[] args) {
+    static Vector<Double> getDoubleVectorOrNull(String[] args) {
         if (args.length == 0) return null;
 
         Vector<Double> list = new Vector<>();
@@ -49,7 +49,7 @@ public class Main {
         return list;
     }
 
-    private static Vector<Double> transformAs8Variant(Vector<Double> doubles) {
+    static Vector<Double> transformAs8Variant(Vector<Double> doubles) {
         double sumOfPositiveNumbers = 0;
 
         for (double num : doubles) {

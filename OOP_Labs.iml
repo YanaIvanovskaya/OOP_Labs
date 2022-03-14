@@ -7,16 +7,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="org.junit.jupiter:junit-jupiter:5.4.2" level="project" />
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$APPLICATION_HOME_DIR$/lib/groovy-2.5.11.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
+        <orderEntry type="library" name="junit-jupiter-api-5.4.2" level="project" />
+        <orderEntry type="library" name="junit-jupiter-5.4.2" level="project" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
