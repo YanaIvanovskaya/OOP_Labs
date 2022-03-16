@@ -1,29 +1,32 @@
 package Task5.code;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.net.MalformedURLException;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // Task 5 - Вариант 1 – парсер URL-ов – 80 баллов
-public class Main {
+public class Task5 {
+
     public static void main(String[] args) {
+        final String enterString = "Please, enter url to validate or empty line to cancel:";
+        final String isNotUrl = "This is not url";
 
-        String[] testUrls = {
-                "ftp://qwerty-123.ru", // ok
-                "ftp://", // error
-                "https:///qwerty.ru",// error
-                "http://qwerty.ru:67767/document" // error
-        };
-
-//        for (String s : testUrls) {
-//            System.out.println(parseUrl(s));
-//        }
-
-        String url = "http://qwerty-123.ru:62222/document/123/234";
-        try {
-            System.out.println(UrlMatcher.getUrlInfo(url));
-        } catch (MalformedURLException ex) {
-            System.out.println("not url");
+        System.out.println(enterString);
+        boolean isInterrupted = false;
+        try (Scanner userInput = new Scanner(System.in)) {
+            while (!isInterrupted) {
+                String url = userInput.nextLine();
+                if (url.trim().isEmpty()) {
+                    isInterrupted = true;
+                } else try {
+                    System.out.println(UrlMatcher.getUrlInfo(url));
+                } catch (MalformedURLException ex) {
+                    System.out.println(isNotUrl);
+                }
+            }
         }
     }
 
@@ -39,14 +42,14 @@ final class UrlMatcher {
     private UrlMatcher() {
     }
 
-    static boolean parseUrl(String url) {
+    static boolean parseUrl(@NotNull String url) {
         String urlRegex = protocolRegex + "://" + hostRegex +
                 "(" + portRegex + "|)" +
                 "(" + documentRegex + "|)";
         return url.matches(urlRegex);
     }
 
-    static String getUrlInfo(String url) throws MalformedURLException {
+    static String getUrlInfo(@NotNull String url) throws MalformedURLException {
         if (!parseUrl(url)) {
             throw new MalformedURLException();
         }
@@ -72,19 +75,19 @@ final class UrlMatcher {
         }
 
         Matcher portMatcher = Pattern.compile(portRegex).matcher(url);
-        String port = portMatcher.find(startIndex) ? portMatcher.group().substring(1) :
-                String.valueOf(Protocol.fromString(protocol).port);
+        String port = String.valueOf(Protocol.fromString(protocol).port);
         if (portMatcher.find(startIndex)) {
-            urlInfo.append("PORT: ")
-                    .append(port)
-                    .append("\n");
+            port = portMatcher.group().substring(1);
             startIndex = portMatcher.end();
         }
+        urlInfo.append("PORT: ")
+                .append(port)
+                .append("\n");
 
         Matcher docMatcher = Pattern.compile(documentRegex).matcher(url);
         if (docMatcher.find(startIndex)) {
             urlInfo.append("DOC: ")
-                    .append(docMatcher.group())
+                    .append(docMatcher.group().substring(1))
                     .append("\n");
         }
 
@@ -155,7 +158,7 @@ enum Protocol {
         return regex.toString();
     }
 
-    static Protocol fromString(String str) {
+    static Protocol fromString(@NotNull String str) {
         for (Protocol protocol : values()) {
             if (protocol.value.equals(str.toLowerCase())) return protocol;
         }

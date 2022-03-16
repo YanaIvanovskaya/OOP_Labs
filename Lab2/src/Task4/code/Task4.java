@@ -1,17 +1,21 @@
 package Task4.code;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 // Task 4 - Вариант 3 – Фильтр нецензурных слов – 60 баллов
-public class Main {
+public class Task4 {
 
     public static void main(String[] args) {
         final String errorArgument = "1 argument expected: <dictionary file path>";
-        final String enterString = "Please, enter not empty string:";
+        final String enterString = "Please, enter string to filter or empty line to cancel:";
+        final String errorFile = "File not found or incorrect";
 
         String dictFilePath = args.length == 1 ? args[0] : null;
 
@@ -20,11 +24,11 @@ public class Main {
             return;
         }
 
-        HashSet<String> badWords = new HashSet<>();
+        Set<String> badWords = new HashSet<>();
         try {
             badWords = readWordsFrom(dictFilePath);
-        } catch (FileNotFoundException ex) {
-            System.out.println(ex.getMessage());
+        } catch (IOException ex) {
+            System.out.println(errorFile);
         }
 
         System.out.println(enterString);
@@ -42,29 +46,20 @@ public class Main {
         }
     }
 
-    private static Scanner getScannerOrNull(String filePath) {
+    @NotNull
+    private static Scanner getScannerOrThrow(@NotNull String filePath) throws IOException {
         File file = new File(filePath);
         if (!(file.exists() && file.isFile() && file.canRead())) {
-            return null;
+            throw new FileNotFoundException();
         }
-        try {
-            return new Scanner(file);
-        } catch (IOException ex) {
-            return null;
-        }
+        return new Scanner(file);
     }
 
-    private static HashSet<String> readWordsFrom(String dictFilePath) throws FileNotFoundException {
-        final String errorFile = "File not found or incorrect";
-        Scanner dictionaryScanner = getScannerOrNull(dictFilePath);
-
-        if (dictionaryScanner == null) {
-            throw new FileNotFoundException(errorFile);
-        }
-
+    @NotNull
+    static Set<String> readWordsFrom(@NotNull String dictFilePath) throws IOException {
         HashSet<String> words = new HashSet<>();
 
-        try (dictionaryScanner) {
+        try (Scanner dictionaryScanner = getScannerOrThrow(dictFilePath)) {
             while (dictionaryScanner.hasNext()) {
                 words.add(dictionaryScanner.next());
             }
@@ -73,7 +68,11 @@ public class Main {
         return words;
     }
 
-    private static String deleteBadWords(String original, HashSet<String> words) {
+    @NotNull
+    static String deleteBadWords(
+            @NotNull String original,
+            @NotNull Set<String> words
+    ) {
         StringBuilder result = new StringBuilder();
         HashSet<String> unifiedWords = new HashSet<>();
 

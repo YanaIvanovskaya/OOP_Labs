@@ -1,5 +1,7 @@
 package Task2.code;
 
+import org.jetbrains.annotations.NotNull;
+
 enum HtmlEntity {
 
     QUOT("\"", "&quot;"),
@@ -27,7 +29,7 @@ enum HtmlEntity {
 }
 
 // Task 2 - Вариант 5 – HTML Decode – 60 баллов
-public class Main {
+public class Task2 {
 
     public static void main(String[] args) {
         final String errorArgument = "1 argument expected <html string>";
@@ -42,7 +44,7 @@ public class Main {
         System.out.println(htmlEncode(html));
     }
 
-    static String htmlEncode(String html) {
+    static String htmlEncode(@NotNull String html) {
         StringBuilder encodedString = new StringBuilder();
         StringBuilder buffer = new StringBuilder();
 
