@@ -10,9 +10,20 @@ import java.util.Scanner;
 public class Task3 {
 
     public static void main(String[] args) {
-        String userInput = new Scanner(System.in).nextLine();
-        Map<String, Integer> frequencyMap = getWordFrequencyMap(userInput);
-        printMap(frequencyMap);
+        System.out.println("Enter string to count the occurrence of words or an empty string to cancel");
+        boolean isInterrupted = false;
+
+        try (Scanner userInput = new Scanner(System.in)) {
+            while (!isInterrupted) {
+                String input = userInput.nextLine();
+                if (input.trim().isEmpty()) {
+                    isInterrupted = true;
+                } else {
+                    Map<String, Integer> frequencyMap = getWordFrequencyMap(input);
+                    printMap(frequencyMap);
+                }
+            }
+        }
     }
 
     static Map<String, Integer> getWordFrequencyMap(@NotNull String line) {
@@ -21,11 +32,22 @@ public class Task3 {
             return frequencyMap;
         }
 
-        for (String word : line.split(" ")) {
-            frequencyMap.put(word, frequencyMap.getOrDefault(word, 0) + 1);
+        for (String word : line.trim().split("( )+")) {
+            putWord(word, frequencyMap);
         }
 
         return frequencyMap;
+    }
+
+    static void putWord(String word, Map<String, Integer> map) {
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+            String key = entry.getKey();
+            if (key.equalsIgnoreCase(word)) {
+                map.put(key, entry.getValue() + 1);
+                return;
+            }
+        }
+        map.put(word, 1);
     }
 
     static void printMap(Map<String, Integer> map) {

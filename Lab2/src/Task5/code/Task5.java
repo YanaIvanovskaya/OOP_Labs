@@ -11,11 +11,9 @@ import java.util.regex.Pattern;
 public class Task5 {
 
     public static void main(String[] args) {
-        final String enterString = "Please, enter url to validate or empty line to cancel:";
-        final String isNotUrl = "This is not url";
-
-        System.out.println(enterString);
+        System.out.println("Please, enter url to validate or empty line to cancel:");
         boolean isInterrupted = false;
+
         try (Scanner userInput = new Scanner(System.in)) {
             while (!isInterrupted) {
                 String url = userInput.nextLine();
@@ -24,7 +22,7 @@ public class Task5 {
                 } else try {
                     System.out.println(UrlMatcher.getUrlInfo(url));
                 } catch (MalformedURLException ex) {
-                    System.out.println(isNotUrl);
+                    System.out.println("This is not url");
                 }
             }
         }
@@ -42,7 +40,7 @@ final class UrlMatcher {
     private UrlMatcher() {
     }
 
-    static boolean parseUrl(@NotNull String url) {
+    static boolean canParseUrl(@NotNull String url) {
         String urlRegex = protocolRegex + "://" + hostRegex +
                 "(" + portRegex + "|)" +
                 "(" + documentRegex + "|)";
@@ -50,7 +48,7 @@ final class UrlMatcher {
     }
 
     static String getUrlInfo(@NotNull String url) throws MalformedURLException {
-        if (!parseUrl(url)) {
+        if (!canParseUrl(url)) {
             throw new MalformedURLException();
         }
         StringBuilder urlInfo = new StringBuilder(url).append("\n");
@@ -96,36 +94,26 @@ final class UrlMatcher {
 
     private static String getPortNumberRegex() {
         final String or = "|";
-        final String num0_9 = "[0-9]";
-        final String numberValue = "/N";
 
         final String num1_9 = "[1-9]";
-        final String num10_99 = "([1-9]/N)".replaceAll(numberValue, num0_9);
-        final String num100_999 = "([1-9]/N/N)".replaceAll(numberValue, num0_9);
-        final String num1000_9999 = "([1-9]/N/N/N)".replaceAll(numberValue, num0_9);
-        final String num10000_59999 = "([1-5]/N/N/N/N)".replaceAll(numberValue, num0_9);
-        final String num60000_64999 = "(6[0-4]/N/N/N)".replaceAll(numberValue, num0_9);
-        final String num65000_65499 = "(65[0-4]/N/N)".replaceAll(numberValue, num0_9);
-        final String num65500_65529 = "(655[0-2]/N)".replaceAll(numberValue, num0_9);
-        final String num65530_65535 = "(6553[0-5])".replaceAll(numberValue, num0_9);
+        final String num10_99 = "([1-9][0-9])";
+        final String num100_999 = "([1-9][0-9][0-9])";
+        final String num1000_9999 = "([1-9][0-9][0-9][0-9])";
+        final String num10000_59999 = "([1-5][0-9][0-9][0-9][0-9])";
+        final String num60000_64999 = "(6[0-4][0-9][0-9][0-9])";
+        final String num65000_65499 = "(65[0-4][0-9][0-9])";
+        final String num65500_65529 = "(655[0-2][0-9])";
+        final String num65530_65535 = "(6553[0-5])";
 
         return num65530_65535 +
-                or +
-                num65500_65529 +
-                or +
-                num65000_65499 +
-                or +
-                num60000_64999 +
-                or +
-                num10000_59999 +
-                or +
-                num1000_9999 +
-                or +
-                num100_999 +
-                or +
-                num10_99 +
-                or +
-                num1_9;
+                or + num65500_65529 +
+                or + num65000_65499 +
+                or + num60000_64999 +
+                or + num10000_59999 +
+                or + num1000_9999 +
+                or + num100_999 +
+                or + num10_99 +
+                or + num1_9;
     }
 
 }

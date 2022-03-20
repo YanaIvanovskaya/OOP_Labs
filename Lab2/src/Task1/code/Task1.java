@@ -8,13 +8,10 @@ import java.util.Vector;
 public class Task1 {
 
     public static void main(String[] args) {
-        final String errorArgument =
-                "Invalid sequence: expected <number> <number> <number> ...";
-
         Vector<Double> doubles = getDoubleVectorOrNull(args);
 
         if (doubles == null) {
-            System.out.println(errorArgument);
+            System.out.println("Invalid sequence: expected <number> <number> <number> ...");
         } else {
             Vector<Double> result = transformAs8Variant(doubles);
             printResult(result);

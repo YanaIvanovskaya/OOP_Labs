@@ -2,6 +2,8 @@ package Task2.code;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Scanner;
+
 enum HtmlEntity {
 
     QUOT("\"", "&quot;"),
@@ -32,50 +34,59 @@ enum HtmlEntity {
 public class Task2 {
 
     public static void main(String[] args) {
-        final String errorArgument = "1 argument expected <html string>";
+        System.out.println("Enter html to decoding or an empty string to cancel");
+        boolean isInterrupted = false;
 
-        String html = args.length == 1 ? args[0] : null;
-
-        if (html == null) {
-            System.out.println(errorArgument);
-            return;
+        try (Scanner userInput = new Scanner(System.in)) {
+            while (!isInterrupted) {
+                String html = userInput.nextLine();
+                if (html.trim().isEmpty()) {
+                    isInterrupted = true;
+                } else {
+                    String decodedHtml = htmlDecode(html);
+                    System.out.println(decodedHtml);
+                }
+            }
         }
-
-        System.out.println(htmlEncode(html));
     }
 
-    static String htmlEncode(@NotNull String html) {
-        StringBuilder encodedString = new StringBuilder();
-        StringBuilder buffer = new StringBuilder();
+    static String htmlDecode(@NotNull String html) {
+        StringBuilder decodedString = new StringBuilder();
+        StringBuilder entityBuffer = new StringBuilder();
 
         for (int i = 0; i < html.length(); i++) {
             char ch = html.charAt(i);
-            boolean isEndOfEntity = ch == ';';
-            boolean isNotPartOfEntity = isEndOfEntity && buffer.isEmpty();
-            boolean isLastPartOfEntity = isEndOfEntity && !buffer.isEmpty();
+            boolean isJustSemicolon = ch == ';' && entityBuffer.isEmpty();
 
-            if (ch == '&') {
-                encodedString.append(buffer);
-                buffer.setLength(0);
-                buffer.append(ch);
-            } else if (isNotPartOfEntity) {
-                encodedString.append(ch);
-            } else if (isLastPartOfEntity) {
-                buffer.append(ch);
-                HtmlEntity entity = HtmlEntity.fromString(buffer.toString());
-                switch (entity) {
-                    case UNKNOWN -> encodedString.append(buffer);
-                    default -> encodedString.append(entity.value);
+            if (isJustSemicolon) {
+                decodedString.append(ch);
+                continue;
+            }
+
+            switch (ch) {
+                case '&' -> {
+                    decodedString.append(entityBuffer);
+                    entityBuffer.setLength(0);
+                    entityBuffer.append(ch);
                 }
-                buffer.setLength(0);
-            } else {
-                if (buffer.isEmpty()) encodedString.append(ch);
-                else buffer.append(ch);
+                case ';' -> {
+                    entityBuffer.append(ch);
+                    HtmlEntity entity = HtmlEntity.fromString(entityBuffer.toString());
+                    switch (entity) {
+                        case UNKNOWN -> decodedString.append(entityBuffer);
+                        default -> decodedString.append(entity.value);
+                    }
+                    entityBuffer.setLength(0);
+                }
+                default -> {
+                    if (entityBuffer.isEmpty()) decodedString.append(ch);
+                    else entityBuffer.append(ch);
+                }
             }
         }
 
-        encodedString.append(buffer);
-        return encodedString.toString();
+        decodedString.append(entityBuffer);
+        return decodedString.toString();
     }
 
 }

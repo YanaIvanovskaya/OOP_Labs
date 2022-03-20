@@ -3,7 +3,6 @@ package Task4.code;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Scanner;
@@ -13,14 +12,10 @@ import java.util.Set;
 public class Task4 {
 
     public static void main(String[] args) {
-        final String errorArgument = "1 argument expected: <dictionary file path>";
-        final String enterString = "Please, enter string to filter or empty line to cancel:";
-        final String errorFile = "File not found or incorrect";
-
         String dictFilePath = args.length == 1 ? args[0] : null;
 
         if (dictFilePath == null) {
-            System.out.println(errorArgument);
+            System.out.println("1 argument expected: <dictionary file path>");
             return;
         }
 
@@ -28,10 +23,10 @@ public class Task4 {
         try {
             badWords = readWordsFrom(dictFilePath);
         } catch (IOException ex) {
-            System.out.println(errorFile);
+            System.out.println("File not found or incorrect");
         }
 
-        System.out.println(enterString);
+        System.out.println("Please, enter string to filter or empty line to cancel:");
         boolean isInterrupted = false;
         try (Scanner userInput = new Scanner(System.in)) {
             while (!isInterrupted) {
@@ -47,19 +42,10 @@ public class Task4 {
     }
 
     @NotNull
-    private static Scanner getScannerOrThrow(@NotNull String filePath) throws IOException {
-        File file = new File(filePath);
-        if (!(file.exists() && file.isFile() && file.canRead())) {
-            throw new FileNotFoundException();
-        }
-        return new Scanner(file);
-    }
-
-    @NotNull
     static Set<String> readWordsFrom(@NotNull String dictFilePath) throws IOException {
         HashSet<String> words = new HashSet<>();
 
-        try (Scanner dictionaryScanner = getScannerOrThrow(dictFilePath)) {
+        try (Scanner dictionaryScanner = new Scanner(new File(dictFilePath))) {
             while (dictionaryScanner.hasNext()) {
                 words.add(dictionaryScanner.next());
             }
@@ -80,7 +66,7 @@ public class Task4 {
             unifiedWords.add(word.toLowerCase());
         }
 
-        for (String word : original.split(" ")) {
+        for (String word : original.trim().split("( )+")) {
             if (!unifiedWords.contains(word.toLowerCase())) {
                 result.append(" ").append(word);
             }

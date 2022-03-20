@@ -1,2 +1,4 @@
-apple pineapple
-grape   milk
+     apple    pineapple
+
+   grape
+        milk

@@ -15,37 +15,37 @@ class Task5Test {
     @Test
     void case_url_without_port() {
         String url = "http://qwerty.ru/document/12/23";
-        Assertions.assertTrue(UrlMatcher.parseUrl(url));
+        Assertions.assertTrue(UrlMatcher.canParseUrl(url));
     }
 
     @Test
     void case_url_with_port() {
         String url = "http://qwerty.ru:345/document/12/23";
-        Assertions.assertTrue(UrlMatcher.parseUrl(url));
+        Assertions.assertTrue(UrlMatcher.canParseUrl(url));
     }
 
     @Test
     void case_url_with_unknown_protocol() {
         String url = "ws://qwerty.ru:345/document/12/23";
-        Assertions.assertFalse(UrlMatcher.parseUrl(url));
+        Assertions.assertFalse(UrlMatcher.canParseUrl(url));
     }
 
     @Test
     void case_url_port_is_out_of_range_1_65535() {
         String url = "http://qwerty.ru:65888/document/12/23";
-        Assertions.assertFalse(UrlMatcher.parseUrl(url));
+        Assertions.assertFalse(UrlMatcher.canParseUrl(url));
     }
 
     @Test
     void case_url_with_protocol_in_upper_case() {
         String url = "HTTPS://qwerty.ru/document/12/23";
-        Assertions.assertTrue(UrlMatcher.parseUrl(url));
+        Assertions.assertTrue(UrlMatcher.canParseUrl(url));
     }
 
     @Test
     void case_url_without_document() {
         String url = "https://qwerty.ru";
-        Assertions.assertTrue(UrlMatcher.parseUrl(url));
+        Assertions.assertTrue(UrlMatcher.canParseUrl(url));
     }
 
     @Test
@@ -59,7 +59,7 @@ class Task5Test {
                 "ftp://12-34-343.ru",
         };
         for (String url : correctUrls) {
-            Assertions.assertTrue(UrlMatcher.parseUrl(url));
+            Assertions.assertTrue(UrlMatcher.canParseUrl(url));
         }
     }
 
