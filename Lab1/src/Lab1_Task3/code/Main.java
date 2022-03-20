@@ -3,18 +3,15 @@ package Lab1_Task3.code;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
-        final String errorArgument = "1 argument expected: <input file path>";
-
         File input = args.length != 1 ? null : new File(args[0]);
 
         if (input == null) {
-            System.out.println(errorArgument);
+            System.out.println("1 argument expected: <input file path>");
             return;
         }
 
@@ -22,23 +19,17 @@ public class Main {
     }
 
     static void invertMatrixFrom(File input) {
-        final String errorFile = "File is not correct";
-        final String errorMatrix =
-                "Matrix in file must be of size 3x3 and contain only numeric values";
-        final String canNotBeInverted =
-                "Matrix can not be inverted because its determinant is 0";
-
         try {
             double[][] originalMatrix = readMatrixFromFile(input);
             double[][] result = Matrix3x3Inverter.invertOrNull(originalMatrix);
 
-            if (result == null) System.out.println(canNotBeInverted);
-            else printMatrix(result);
-
+            if (result == null) {
+                System.out.println("Matrix can not be inverted because its determinant is 0");
+            } else printMatrix(result);
         } catch (FileNotFoundException ex) {
-            System.out.println(errorFile);
+            System.out.println("File is not correct");
         } catch (IllegalArgumentException ex) {
-            System.out.println(errorMatrix);
+            System.out.println("Matrix in file must be of size 3x3 and contain only numeric values");
         }
     }
 
@@ -94,12 +85,6 @@ final class Matrix3x3Inverter {
     private Matrix3x3Inverter() {
     }
 
-    private static final double[][] E = {
-            {1.0, 0.0, 0.0},
-            {0.0, 1.0, 0.0},
-            {0.0, 0.0, 1.0}
-    };
-
     private static final int MATRIX_SIZE = 3;
 
     static double[][] invertOrNull(double[][] matrix) throws IllegalArgumentException {
@@ -114,16 +99,8 @@ final class Matrix3x3Inverter {
 
         double[][] minorMatrix = findMinorMatrix(matrix);
         double[][] transposedMinorMatrix = transpose(minorMatrix);
-        double[][] invertedMatrix = new double[MATRIX_SIZE][MATRIX_SIZE];
 
-        for (int row = 0; row < MATRIX_SIZE; row++) {
-            for (int column = 0; column < MATRIX_SIZE; column++) {
-                invertedMatrix[row][column] =
-                        transposedMinorMatrix[row][column] / determinant;
-            }
-        }
-
-        return isCorrectInverted(matrix, invertedMatrix) ? invertedMatrix : null;
+        return divideByDeterminant(transposedMinorMatrix, determinant);
     }
 
     private static boolean isMatrixValid(double[][] matrix) {
@@ -195,31 +172,20 @@ final class Matrix3x3Inverter {
         return transposedMatrix;
     }
 
+    private static double[][] divideByDeterminant(double[][] matrix, double determinant) {
+        double[][] invertedMatrix = new double[MATRIX_SIZE][MATRIX_SIZE];
+        for (int row = 0; row < MATRIX_SIZE; row++) {
+            for (int column = 0; column < MATRIX_SIZE; column++) {
+                invertedMatrix[row][column] =
+                        matrix[row][column] / determinant;
+            }
+        }
+        return invertedMatrix;
+    }
+
     private static double find2xDeterminant(double[][] matrix) {
         return (matrix[0][0] * matrix[1][1])
                 - (matrix[0][1] * matrix[1][0]);
-    }
-
-    private static boolean isCorrectInverted(
-            double[][] originalMatrix,
-            double[][] invertedMatrix
-    ) {
-        double[][] result = new double[MATRIX_SIZE][MATRIX_SIZE];
-        for (int row = 0; row < MATRIX_SIZE; row++) {
-            for (int column = 0; column < MATRIX_SIZE; column++) {
-                result[row][column] = Math.round(
-                        (originalMatrix[row][0] *
-                                invertedMatrix[0][column])
-
-                                + (originalMatrix[row][1] *
-                                invertedMatrix[1][column])
-
-                                + (originalMatrix[row][2] *
-                                invertedMatrix[2][column])
-                );
-            }
-        }
-        return Arrays.deepEquals(result, E);
     }
 
 }

@@ -9,12 +9,8 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        final int argsCount = 4;
-        final String errorArguments =
-                "4 arguments expected: <input file> <output file> <search> <replace>";
-
-        if (args.length != argsCount) {
-            System.out.println(errorArguments);
+        if (args.length != 4) {
+            System.out.println("4 arguments expected: <input file> <output file> <search> <replace>");
             return;
         }
 
@@ -39,17 +35,14 @@ public class Main {
         String newLine;
         String replacedLine;
 
-        Scanner scanner = getScannerOrNull(inputPath);
-        FileWriter writer = getFileWriterOrNull(outputPath);
-
-        if (scanner == null) {
-            throw new FileNotFoundException(getFileErrorMessage(inputPath));
-        }
-        if (writer == null) {
-            throw new FileNotFoundException(getFileErrorMessage(outputPath));
-        }
-
-        try (scanner) {
+        try (Scanner scanner = getScannerOrNull(inputPath)) {
+            if (scanner == null) {
+                throw new FileNotFoundException(getFileErrorMessage(inputPath));
+            }
+            FileWriter writer = getFileWriterOrNull(outputPath);
+            if (writer == null) {
+                throw new FileNotFoundException(getFileErrorMessage(outputPath));
+            }
             try (writer) {
                 while (scanner.hasNextLine()) {
                     newLine = scanner.nextLine();
@@ -85,7 +78,7 @@ public class Main {
 
         try {
             return isValidAndReadable ? new Scanner(input) : null;
-        } catch (IOException ex) {
+        } catch (FileNotFoundException ex) {
             return null;
         }
     }

@@ -6,21 +6,18 @@ public class Bin2Dec {
         String binNumber = args.length != 1 ? null : args[0];
 
         try {
-            System.out.println(convertToDecNumber(binNumber));
+            System.out.println(convertToNumber(binNumber));
         } catch (IllegalArgumentException ex) {
             System.out.println(ex.getMessage());
         }
     }
 
-    static int convertToDecNumber(String binNumber) throws IllegalArgumentException {
-        final String errorArgument = "1 argument expected <bin number>";
-        final String errorNumber = "Bin number is incorrect - expected <= 32 bit";
-
+    static int convertToNumber(String binNumber) throws IllegalArgumentException {
         if (binNumber == null) {
-            throw new IllegalArgumentException(errorArgument);
+            throw new IllegalArgumentException("1 argument expected <bin number>");
         }
         if (!isCorrectBinNumber(binNumber)) {
-            throw new IllegalArgumentException(errorNumber);
+            throw new IllegalArgumentException("Bin number is incorrect - expected <= 32 bit");
         }
 
         int decNumber = 0;
