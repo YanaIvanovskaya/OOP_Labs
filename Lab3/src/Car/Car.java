@@ -1,20 +1,21 @@
+package Car;
+
 public class Car {
 
     private static final int MAX_SPEED = 150;
 
     private boolean isTurnedOn;
     private Direction direction;
-    private int speed;
     private Gear gear;
-    private int maxSpeed;
+    private int speed;
 
-    enum Direction {
+    public enum Direction {
         FORWARD,
         BACK,
         STAND
     }
 
-    enum Gear {
+    public enum Gear {
         REVERSE(-1, 0, 20),
         NEUTRAL(0, 0, MAX_SPEED),
         ONE(1, 0, 30),
@@ -33,15 +34,9 @@ public class Car {
             this.minSpeed = min;
         }
 
-        static Gear getGearFromStringOrNull(String str) {
-            int gear;
-            try {
-                gear = Integer.parseInt(str);
-            } catch (NumberFormatException ex) {
-                return null;
-            }
+        static Gear getGearFromStringOrNull(String gear) {
             for (Gear g : values()) {
-                if (g.value == gear) {
+                if (String.valueOf(g.value).equals(gear)) {
                     return g;
                 }
             }
@@ -65,10 +60,6 @@ public class Car {
         return gear;
     }
 
-    public int getMaxSpeed() {
-        return maxSpeed;
-    }
-
     private Car() {
     }
 
@@ -78,7 +69,6 @@ public class Car {
         car.direction = Direction.STAND;
         car.speed = 0;
         car.gear = Gear.NEUTRAL;
-        car.maxSpeed = MAX_SPEED;
         return car;
     }
 
@@ -93,18 +83,17 @@ public class Car {
         car.direction = direction;
         car.speed = speed;
         car.gear = gear;
-        car.maxSpeed = MAX_SPEED;
         return car;
     }
 
     public boolean turnOnEngine() {
-        this.isTurnedOn = true;
+        isTurnedOn = true;
         return true;
     }
 
     public boolean turnOffEngine() {
-        if (this.speed == 0 && this.gear == Gear.NEUTRAL) {
-            this.isTurnedOn = false;
+        if (speed == 0 && gear == Gear.NEUTRAL) {
+            isTurnedOn = false;
             return true;
         }
 
@@ -116,41 +105,35 @@ public class Car {
             System.out.println("Двигатель заглушен. Нельзя изменить передачу");
             return false;
         }
-        boolean canSwitch = false;
+        boolean canSwitch;
+        boolean canSwitchReverse = speed == 0 && direction == Direction.STAND;
+        boolean isSpeedInRange = speed >= gear.minSpeed && speed <= gear.maxSpeed;
 
         switch (gear) {
-            case REVERSE -> {
-                canSwitch = speed == 0 && direction == Direction.STAND;
-//                if (canSwitchReverse) {
-//                    direction = Direction.BACK;
-//                    canSwitch = true;
-//                }
-            }
+            case REVERSE -> canSwitch = canSwitchReverse;
             case NEUTRAL -> canSwitch = true;
             default -> {
                 switch (this.gear) {
-                    case REVERSE -> {
-                        return false;
-                    }
-                    case NEUTRAL -> canSwitch = speed == 0 || direction != Direction.BACK;
-                    default -> canSwitch = speed >= gear.minSpeed && speed <= gear.maxSpeed;
+                    case REVERSE -> canSwitch = canSwitchReverse;
+                    case NEUTRAL -> canSwitch = isSpeedInRange && direction != Direction.BACK;
+                    default -> canSwitch = isSpeedInRange;
                 }
             }
         }
         if (canSwitch) {
             this.gear = gear;
-        }
+        } else System.out.println("Нельзя переключиться на эту передачу");
         return canSwitch;
     }
 
     public boolean setSpeed(int speed) {
+        boolean isNeutral = gear == Gear.NEUTRAL;
+        boolean isSpeedInRangeOfCurrentGear = speed >= gear.minSpeed && speed <= gear.maxSpeed;
+
         if (speed < 0) {
             System.out.println("Переключение на отрицательную скорость невозможно");
             return false;
         }
-
-        boolean isNeutral = gear == Gear.NEUTRAL;
-        boolean isSpeedInRangeOfCurrentGear = speed >= gear.minSpeed && speed <= gear.maxSpeed;
 
         if (!isTurnedOn) {
             System.out.println("Двигатель заглушен. Нельзя задать скорость");

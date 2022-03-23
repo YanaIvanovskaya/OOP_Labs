@@ -1,3 +1,4 @@
+import Car.Car;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -6,9 +7,9 @@ class CarTest {
     @Test
     void createCar() {
         Car car = Car.createCar();
-        Assertions.assertEquals(car.getDirection(), Car.Direction.STAND);
-        Assertions.assertEquals(car.getGear(), Car.Gear.NEUTRAL);
-        Assertions.assertEquals(car.getMaxSpeed(), 150);
+        Assertions.assertEquals(Car.Direction.STAND, car.getDirection());
+        Assertions.assertEquals(Car.Gear.NEUTRAL, car.getGear());
+        Assertions.assertEquals(0, car.getSpeed());
         Assertions.assertFalse(car.isTurnedOn());
     }
 
@@ -56,8 +57,8 @@ class CarTest {
                 Car.Gear.ONE
         );
         Assertions.assertTrue(car.setSpeed(15));
-        Assertions.assertEquals(car.getSpeed(), 15);
-        Assertions.assertEquals(car.getDirection(), Car.Direction.FORWARD);
+        Assertions.assertEquals(15, car.getSpeed());
+        Assertions.assertEquals(Car.Direction.FORWARD, car.getDirection());
     }
 
     @Test
@@ -70,7 +71,7 @@ class CarTest {
         );
         Assertions.assertTrue(car.setSpeed(0));
         Assertions.assertEquals(0, car.getSpeed());
-        Assertions.assertEquals(car.getDirection(), Car.Direction.STAND);
+        Assertions.assertEquals(Car.Direction.STAND, car.getDirection());
     }
 
     @Test
@@ -83,7 +84,7 @@ class CarTest {
         );
         Assertions.assertTrue(car.setSpeed(10));
         Assertions.assertEquals(10, car.getSpeed());
-        Assertions.assertEquals(car.getDirection(), Car.Direction.BACK);
+        Assertions.assertEquals(Car.Direction.BACK, car.getDirection());
     }
 
     @Test
@@ -215,7 +216,6 @@ class CarTest {
                 Car.Gear.ONE
         );
         Assertions.assertTrue(car.setGear(Car.Gear.REVERSE));
-        Assertions.assertEquals(Car.Direction.BACK, car.getDirection());
         Assertions.assertEquals(Car.Gear.REVERSE, car.getGear());
     }
 
@@ -276,6 +276,30 @@ class CarTest {
                 Car.Gear.ONE
         );
         Assertions.assertTrue(car.setGear(Car.Gear.NEUTRAL));
+        Assertions.assertEquals(Car.Gear.NEUTRAL, car.getGear());
+    }
+
+    @Test
+    void case_set_not_neutral_gear_if_current_neutral() {
+        Car car = Car.createCustomCar(
+                true,
+                Car.Direction.STAND,
+                0,
+                Car.Gear.NEUTRAL
+        );
+        Assertions.assertFalse(car.setGear(Car.Gear.TWO));
+        Assertions.assertEquals(Car.Gear.NEUTRAL, car.getGear());
+    }
+
+    @Test
+    void case_set_not_neutral_gear_if_current_neutral_and_direction_back() {
+        Car car = Car.createCustomCar(
+                true,
+                Car.Direction.BACK,
+                15,
+                Car.Gear.NEUTRAL
+        );
+        Assertions.assertFalse(car.setGear(Car.Gear.ONE));
         Assertions.assertEquals(Car.Gear.NEUTRAL, car.getGear());
     }
 
