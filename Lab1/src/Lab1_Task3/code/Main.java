@@ -100,7 +100,7 @@ final class Matrix3x3Inverter {
         double[][] minorMatrix = findMinorMatrix(matrix);
         double[][] transposedMinorMatrix = transpose(minorMatrix);
 
-        return divideByDeterminant(transposedMinorMatrix, determinant);
+        return scale(transposedMinorMatrix, 1 / determinant);
     }
 
     private static boolean isMatrixValid(double[][] matrix) {
@@ -172,12 +172,12 @@ final class Matrix3x3Inverter {
         return transposedMatrix;
     }
 
-    private static double[][] divideByDeterminant(double[][] matrix, double determinant) {
+    private static double[][] scale(double[][] matrix, double determinant) {
         double[][] invertedMatrix = new double[MATRIX_SIZE][MATRIX_SIZE];
         for (int row = 0; row < MATRIX_SIZE; row++) {
             for (int column = 0; column < MATRIX_SIZE; column++) {
                 invertedMatrix[row][column] =
-                        matrix[row][column] / determinant;
+                        matrix[row][column] * determinant;
             }
         }
         return invertedMatrix;

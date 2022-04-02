@@ -16,14 +16,14 @@ class Task4Test {
     @Test
     void case_string_has_no_bad_words() {
         String original = "I have to do it better";
-        Assertions.assertEquals(Task4.deleteBadWords(original, badWords), original);
+        Assertions.assertEquals(Task4.deleteWords(original, badWords), original);
     }
 
     @Test
     void case_string_has_bad_words_in_different_case() {
         String original = "I have to eat this AppLe and then AVOcaDo";
         String expected = "I have to eat this and then";
-        Assertions.assertEquals(Task4.deleteBadWords(original, badWords), expected);
+        Assertions.assertEquals(Task4.deleteWords(original, badWords), expected);
     }
 
     @Test
@@ -37,7 +37,7 @@ class Task4Test {
     void case_set_of_bad_words_is_empty() {
         Set<String> emptyBadWords = new HashSet<>();
         String original = "I have to do it better";
-        Assertions.assertEquals(Task4.deleteBadWords(original, emptyBadWords), original);
+        Assertions.assertEquals(Task4.deleteWords(original, emptyBadWords), original);
     }
 
     @Test
@@ -48,7 +48,7 @@ class Task4Test {
 
     @Test
     void case_string_is_empty() {
-        Assertions.assertEquals(Task4.deleteBadWords("", badWords), "");
+        Assertions.assertEquals(Task4.deleteWords("", badWords), "");
     }
 
     @Test

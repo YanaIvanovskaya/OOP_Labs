@@ -5,7 +5,6 @@ public class Car {
     private static final int MAX_SPEED = 150;
 
     private boolean isTurnedOn;
-    private Direction direction;
     private Gear gear;
     private int speed;
 
@@ -24,7 +23,7 @@ public class Car {
         FOUR(4, 40, 90),
         FIVE(5, 50, MAX_SPEED);
 
-        final int value;
+        public final int value;
         final int maxSpeed;
         final int minSpeed;
 
@@ -34,13 +33,17 @@ public class Car {
             this.minSpeed = min;
         }
 
-        static Gear getGearFromStringOrNull(String gear) {
+        public static Gear getGearFromStringOrNull(String gear) {
             for (Gear g : values()) {
                 if (String.valueOf(g.value).equals(gear)) {
                     return g;
                 }
             }
             return null;
+        }
+
+        public static boolean isCorrectSpeedForGear(int speed, Gear gear) {
+            return speed >= gear.minSpeed && speed <= gear.maxSpeed;
         }
     }
 
@@ -49,11 +52,13 @@ public class Car {
     }
 
     public Direction getDirection() {
-        return direction;
+        if (speed == 0) {
+            return Direction.STAND;
+        } else return speed < 0 ? Direction.BACK : Direction.FORWARD;
     }
 
     public int getSpeed() {
-        return speed;
+        return Math.abs(speed);
     }
 
     public Gear getGear() {
@@ -66,48 +71,28 @@ public class Car {
     public static Car createCar() {
         Car car = new Car();
         car.isTurnedOn = false;
-        car.direction = Direction.STAND;
         car.speed = 0;
         car.gear = Gear.NEUTRAL;
         return car;
     }
 
-    public static Car createCustomCar(
-            boolean isTurnedOn,
-            Direction direction,
-            int speed,
-            Gear gear
-    ) {
-        Car car = new Car();
-        car.isTurnedOn = isTurnedOn;
-        car.direction = direction;
-        car.speed = speed;
-        car.gear = gear;
-        return car;
-    }
-
-    public boolean turnOnEngine() {
+    public void turnOnEngine() {
         isTurnedOn = true;
-        return true;
     }
 
-    public boolean turnOffEngine() {
-        if (speed == 0 && gear == Gear.NEUTRAL) {
+    public void turnOffEngine() {
+        if (getSpeed() == 0 && gear == Gear.NEUTRAL) {
             isTurnedOn = false;
-            return true;
-        }
-
-        return false;
+        } else throw new EngineControlException(EngineControlError.CAR_IS_MOVING);
     }
 
-    public boolean setGear(Gear gear) {
+    public void setGear(Gear gear) throws GearControlException {
         if (!isTurnedOn) {
-            System.out.println("Двигатель заглушен. Нельзя изменить передачу");
-            return false;
+            throw new GearControlException(GearControlError.ENGINE_OFF);
         }
         boolean canSwitch;
-        boolean canSwitchReverse = speed == 0 && direction == Direction.STAND;
-        boolean isSpeedInRange = speed >= gear.minSpeed && speed <= gear.maxSpeed;
+        boolean canSwitchReverse = getSpeed() == 0;
+        boolean isSpeedInRange = getSpeed() >= gear.minSpeed && getSpeed() <= gear.maxSpeed;
 
         switch (gear) {
             case REVERSE -> canSwitch = canSwitchReverse;
@@ -115,58 +100,36 @@ public class Car {
             default -> {
                 switch (this.gear) {
                     case REVERSE -> canSwitch = canSwitchReverse;
-                    case NEUTRAL -> canSwitch = isSpeedInRange && direction != Direction.BACK;
+                    case NEUTRAL -> canSwitch = isSpeedInRange && speed >= 0;
                     default -> canSwitch = isSpeedInRange;
                 }
             }
         }
-        if (canSwitch) {
-            this.gear = gear;
-        } else System.out.println("Нельзя переключиться на эту передачу");
-        return canSwitch;
+        if (canSwitch) this.gear = gear;
+        else throw new GearControlException(GearControlError.CANNOT_SWITCH);
     }
 
-    public boolean setSpeed(int speed) {
+    public void setSpeed(int speed) throws SpeedControlException {
+        if (speed < 0) throw new SpeedControlException((SpeedControlError.NEGATIVE_SPEED));
+
+        if (!isTurnedOn) throw new SpeedControlException(SpeedControlError.ENGINE_OFF);
+
+        boolean inNotInRange = speed >= gear.minSpeed && speed <= gear.maxSpeed;
+        if (!inNotInRange)
+            throw new SpeedControlException(SpeedControlError.NOT_IN_RANGE);
+
         boolean isNeutral = gear == Gear.NEUTRAL;
-        boolean isSpeedInRangeOfCurrentGear = speed >= gear.minSpeed && speed <= gear.maxSpeed;
+        if (isNeutral && speed > getSpeed())
+            throw new SpeedControlException(SpeedControlError.NEUTRAL_GEAR);
 
-        if (speed < 0) {
-            System.out.println("Переключение на отрицательную скорость невозможно");
-            return false;
-        }
-
-        if (!isTurnedOn) {
-            System.out.println("Двигатель заглушен. Нельзя задать скорость");
-            return false;
-        }
-
-        if (!isSpeedInRangeOfCurrentGear) {
-            System.out.println("Скорость не входит в диапазон текущей передачи");
-            return false;
-        }
-
-        if (isNeutral && speed > this.speed) {
-            System.out.println("На нейтральной передаче нельзя разогнаться");
-            return false;
-        }
-
-        this.speed = speed;
-        if (direction == Direction.STAND) {
-            switch (gear) {
-                case REVERSE -> direction = Direction.BACK;
-                default -> direction = Direction.FORWARD;
-            }
-        } else if (speed == 0) {
-            direction = Direction.STAND;
-        }
-        return true;
+        this.speed = (gear == Gear.REVERSE) ? -speed : speed;
     }
 
     public String getInfo() {
-        return "ENGINE: " + (isTurnedOn ? "ON" : "OFF") + "\n"
-                + "SPEED: " + speed + "\n"
-                + "GEAR: " + gear + "\n"
-                + "DIRECTION: " + direction + "\n";
+        return "ENGINE: " + (isTurnedOn() ? "ON" : "OFF") + "\n"
+                + "SPEED: " + getSpeed() + "\n"
+                + "GEAR: " + getGear() + "\n"
+                + "DIRECTION: " + getDirection() + "\n";
     }
 
 }

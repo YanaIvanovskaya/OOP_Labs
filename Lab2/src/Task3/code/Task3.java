@@ -3,6 +3,7 @@ package Task3.code;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -39,7 +40,8 @@ public class Task3 {
         return frequencyMap;
     }
 
-    static void putWord(String word, Map<String, Integer> map) {
+    // сделать поиск нативным методом
+    static void putWord(String word, HashMap<String, Integer> map) {
         for (Map.Entry<String, Integer> entry : map.entrySet()) {
             String key = entry.getKey();
             if (key.equalsIgnoreCase(word)) {
@@ -47,6 +49,7 @@ public class Task3 {
                 return;
             }
         }
+
         map.put(word, 1);
     }
 

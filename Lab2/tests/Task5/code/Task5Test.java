@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
 
 class Task5Test {
 
@@ -64,28 +66,26 @@ class Task5Test {
     }
 
     @Test
-    void check_info_for_url_without_port() throws MalformedURLException {
-        String url = "http://qwerty-123.dev.com/user/123?page=4311";
-        String expectedInfo = """
-                http://qwerty-123.dev.com/user/123?page=4311
-                PROTOCOL: http
-                HOST: qwerty-123.dev.com
-                PORT: 80
-                DOC: user/123?page=4311
-                """;
-        Assertions.assertEquals(UrlMatcher.getUrlInfo(url), expectedInfo);
-    }
+    void getUrlInfo() throws MalformedURLException {
+        HashMap<String, UrlInfo> testMap = new HashMap<>();
+        // host
+        testMap.put("https://qwerty.ru", new UrlInfo(Protocol.HTTPS, "qwerty.ru", 443, ""));
+        testMap.put("https://q", new UrlInfo(Protocol.HTTPS, "q", 443, ""));
+        testMap.put("https://.", new UrlInfo(Protocol.HTTPS, ".", 443, ""));
+        testMap.put("http://qwerty-23.ru:56", new UrlInfo(Protocol.HTTP, "qwerty-23.ru", 56, ""));
 
-    @Test
-    void check_info_for_url_without_document() throws MalformedURLException {
-        String url = "http://qwerty-123.dev.com";
-        String expectedInfo = """
-                http://qwerty-123.dev.com
-                PROTOCOL: http
-                HOST: qwerty-123.dev.com
-                PORT: 80
-                """;
-        Assertions.assertEquals(UrlMatcher.getUrlInfo(url), expectedInfo);
+        //document
+        testMap.put("ftp://q.ru/343/565", new UrlInfo(Protocol.FTP, "q.ru", 21, "/343/565"));
+        testMap.put("https://q:67/f/d", new UrlInfo(Protocol.HTTPS, "q", 67, "/f/d"));
+        testMap.put("http://qwerty-23.ru:569/we", new UrlInfo(Protocol.HTTP, "qwerty-23.ru", 569, "/we"));
+
+        // port
+        testMap.put("HTTPS://q.u:1/343/565", new UrlInfo(Protocol.HTTPS, "q.u", 1, "/343/565"));
+        testMap.put("https://q:6", new UrlInfo(Protocol.HTTPS, "q", 6, ""));
+
+        for (Map.Entry<String, UrlInfo> entry : testMap.entrySet()) {
+            Assertions.assertEquals(entry.getValue(), UrlMatcher.getUrlInfo(entry.getKey()));
+        }
     }
 
 }

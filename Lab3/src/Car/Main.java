@@ -1,7 +1,5 @@
 package Car;
 
-import Car.Car;
-
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,10 +43,11 @@ public class Main {
     }
 
     private static void processCommandEngineOff(Car car) {
-        if (car.turnOffEngine()) {
+        try {
+            car.turnOffEngine();
             System.out.println("Двигатель заглушен");
-        } else {
-            System.out.println("Нельзя заглушить двигатель на ходу");
+        } catch (EngineControlException ex) {
+            System.out.println(ex.error.message);
         }
     }
 
@@ -61,14 +60,16 @@ public class Main {
         Command command = Command.SET_GEAR;
         Matcher gearMatcher = Pattern.compile(command.paramPattern).matcher(input);
 
-        if (gearMatcher.find()) {
-            String strGear = gearMatcher.group();
-            Car.Gear gear = Car.Gear.getGearFromStringOrNull(strGear);
-            if (gear == null) {
-                System.out.println("Неизвестная передача: " + strGear);
-            } else if (car.setGear(gear)) {
-                System.out.println("Передача переключена на " + gear);
-            }
+        String strGear = gearMatcher.find() ? gearMatcher.group() : "";
+        Car.Gear gear = Car.Gear.getGearFromStringOrNull(strGear);
+
+        if (gear == null) {
+            System.out.println("Неизвестная передача: " + strGear);
+        } else try {
+            car.setGear(gear);
+            System.out.println("Передача переключена на " + gear);
+        } catch (GearControlException ex) {
+            System.out.println(ex.error.message);
         }
     }
 
@@ -76,19 +77,15 @@ public class Main {
         Command command = Command.SET_SPEED;
         Matcher speedMatcher = Pattern.compile(command.paramPattern).matcher(input);
 
-        if (speedMatcher.find()) {
-            String strSpeed = speedMatcher.group();
-            int speed;
-            try {
-                speed = Integer.parseInt(strSpeed);
-            } catch (NumberFormatException ignored) {
-                speed = -1;
-            }
-            if (speed == -1) {
-                System.out.println("Некорректная скорость: " + strSpeed);
-            } else if (car.setSpeed(speed)) {
-                System.out.println("Скорость переключена на " + speed);
-            }
+        String strSpeed = speedMatcher.find() ? speedMatcher.group() : "";
+        int speed = strSpeed.matches("([0-9]+)") ? Integer.parseInt(strSpeed) : -1;
+        if (speed == -1) {
+            System.out.println("Некорректная скорость: " + strSpeed);
+        } else try {
+            car.setSpeed(speed);
+            System.out.println("Скорость переключена на " + speed);
+        } catch (SpeedControlException ex) {
+            System.out.println(ex.error.message);
         }
     }
 

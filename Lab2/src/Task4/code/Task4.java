@@ -19,14 +19,17 @@ public class Task4 {
             return;
         }
 
-        Set<String> badWords = new HashSet<>();
         try {
-            badWords = readWordsFrom(dictFilePath);
+            Set<String> words = readWordsFrom(dictFilePath);
+            filterInput(words);
         } catch (IOException ex) {
             System.out.println("File not found or incorrect");
         }
+    }
 
+    private static void filterInput(Set<String> words) {
         System.out.println("Please, enter string to filter or empty line to cancel:");
+
         boolean isInterrupted = false;
         try (Scanner userInput = new Scanner(System.in)) {
             while (!isInterrupted) {
@@ -34,11 +37,20 @@ public class Task4 {
                 if (input.trim().isEmpty()) {
                     isInterrupted = true;
                 } else {
-                    String goodString = deleteBadWords(input, badWords);
-                    System.out.println(goodString);
+                    String filteredStr = deleteWords(input, toLowerCase(words));
+                    System.out.println(filteredStr);
                 }
             }
         }
+    }
+
+    private static Set<String> toLowerCase(Set<String> words) {
+        HashSet<String> unifiedWords = new HashSet<>();
+
+        for (String word : words) {
+            unifiedWords.add(word.toLowerCase());
+        }
+        return unifiedWords;
     }
 
     @NotNull
@@ -55,23 +67,21 @@ public class Task4 {
     }
 
     @NotNull
-    static String deleteBadWords(
-            @NotNull String original,
+    static String deleteWords(
+            @NotNull String line,
             @NotNull Set<String> words
     ) {
         StringBuilder result = new StringBuilder();
-        HashSet<String> unifiedWords = new HashSet<>();
 
-        for (String word : words) {
-            unifiedWords.add(word.toLowerCase());
-        }
+        Scanner scanner = new Scanner(line);
 
-        for (String word : original.trim().split("( )+")) {
-            if (!unifiedWords.contains(word.toLowerCase())) {
+        while (scanner.hasNext()) {
+            String word = scanner.next();
+            if (!words.contains(word.toLowerCase())) {
                 result.append(" ").append(word);
             }
         }
-
+        scanner.close();
         return result.toString().trim();
     }
 
