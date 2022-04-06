@@ -9,7 +9,7 @@ public enum Command {
     SET_SPEED("SetSpeed ", "([0-9]+)"),
     SET_GEAR("SetGear ", "(-1|0|1|2|3|4|5)");
 
-    final String pattern;
+    private final String pattern;
     String paramPattern = "";
 
     Command(String pattern) {

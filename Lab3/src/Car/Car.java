@@ -92,37 +92,38 @@ public class Car {
         }
         boolean canSwitch;
         boolean canSwitchReverse = getSpeed() == 0;
-        boolean isSpeedInRange = getSpeed() >= gear.minSpeed && getSpeed() <= gear.maxSpeed;
+        boolean isSpeedInRange = Gear.isCorrectSpeedForGear(getSpeed(), gear);
 
-        switch (gear) {
-            case REVERSE -> canSwitch = canSwitchReverse;
-            case NEUTRAL -> canSwitch = true;
-            default -> {
-                switch (this.gear) {
-                    case REVERSE -> canSwitch = canSwitchReverse;
-                    case NEUTRAL -> canSwitch = isSpeedInRange && speed >= 0;
-                    default -> canSwitch = isSpeedInRange;
-                }
-            }
-        }
+        canSwitch = switch (gear) {
+            case REVERSE -> canSwitchReverse;
+            case NEUTRAL -> true;
+            default -> switch (this.gear) {
+                case REVERSE -> canSwitchReverse;
+                case NEUTRAL -> isSpeedInRange && speed >= 0;
+                default -> isSpeedInRange;
+            };
+        };
         if (canSwitch) this.gear = gear;
         else throw new GearControlException(GearControlError.CANNOT_SWITCH);
     }
 
     public void setSpeed(int speed) throws SpeedControlException {
-        if (speed < 0) throw new SpeedControlException((SpeedControlError.NEGATIVE_SPEED));
+        if (speed < 0)
+            throw new SpeedControlException((SpeedControlError.NEGATIVE_SPEED));
 
-        if (!isTurnedOn) throw new SpeedControlException(SpeedControlError.ENGINE_OFF);
+        if (!isTurnedOn)
+            throw new SpeedControlException(SpeedControlError.ENGINE_OFF);
 
-        boolean inNotInRange = speed >= gear.minSpeed && speed <= gear.maxSpeed;
-        if (!inNotInRange)
+        boolean inNotInRange = !Gear.isCorrectSpeedForGear(speed, gear);
+        if (inNotInRange)
             throw new SpeedControlException(SpeedControlError.NOT_IN_RANGE);
 
         boolean isNeutral = gear == Gear.NEUTRAL;
         if (isNeutral && speed > getSpeed())
             throw new SpeedControlException(SpeedControlError.NEUTRAL_GEAR);
 
-        this.speed = (gear == Gear.REVERSE) ? -speed : speed;
+        boolean isReverseDirection = gear == Gear.REVERSE;
+        this.speed = isReverseDirection ? -speed : speed;
     }
 
     public String getInfo() {
