@@ -12,7 +12,7 @@ final class UrlMatcher {
 
     private static final String protocolRegex = getProtocolRegex();
     private static final String hostRegex = "(\\w|[.-])+";
-    private static final String portRegex = "(:(" + getPortNumberRegex() + "))";
+    private static final String portRegex = ":[0-9]+";
     private static final String documentRegex = "(/(.)+)";
 
     private UrlMatcher() {
@@ -22,7 +22,17 @@ final class UrlMatcher {
         String urlRegex = protocolRegex + "://" + hostRegex +
                 "(" + portRegex + "|)" +
                 "(" + documentRegex + "|)";
-        return url.matches(urlRegex);
+        try {
+            boolean isMatchesPattern = url.matches(urlRegex);
+            Integer port = getPortOrNull(url);
+            if (port == null) {
+                return isMatchesPattern;
+            } else {
+                return isMatchesPattern && port >= 1 && port <= 65535;
+            }
+        } catch (MalformedURLException ex) {
+            return false;
+        }
     }
 
     static UrlInfo getUrlInfo(@NotNull String url) throws MalformedURLException {
@@ -60,30 +70,6 @@ final class UrlMatcher {
         );
     }
 
-    private static String getPortNumberRegex() {
-        final String or = "|";
-
-        final String num1_9 = "[1-9]";
-        final String num10_99 = "([1-9][0-9])";
-        final String num100_999 = "([1-9][0-9][0-9])";
-        final String num1000_9999 = "([1-9][0-9][0-9][0-9])";
-        final String num10000_59999 = "([1-5][0-9][0-9][0-9][0-9])";
-        final String num60000_64999 = "(6[0-4][0-9][0-9][0-9])";
-        final String num65000_65499 = "(65[0-4][0-9][0-9])";
-        final String num65500_65529 = "(655[0-2][0-9])";
-        final String num65530_65535 = "(6553[0-5])";
-
-        return num65530_65535 +
-                or + num65500_65529 +
-                or + num65000_65499 +
-                or + num60000_64999 +
-                or + num10000_59999 +
-                or + num1000_9999 +
-                or + num100_999 +
-                or + num10_99 +
-                or + num1_9;
-    }
-
     private static String getProtocolRegex() {
         Iterator<Protocol> protocols = Arrays.stream(
                 Protocol.values())
@@ -103,6 +89,22 @@ final class UrlMatcher {
         }
 
         return regex.toString();
+    }
+
+    private static Integer getPortOrNull(@NotNull String url) throws MalformedURLException {
+        int indexOfProtocolColon = url.indexOf(":");
+        int indexOfPortColon = url.indexOf(":", indexOfProtocolColon + 1);
+        if (indexOfPortColon == -1) return null;
+        try {
+            int indexOfPortEnd = url.indexOf("/", indexOfPortColon);
+            if (indexOfPortEnd == -1) {
+                indexOfPortEnd = url.length();
+            }
+            String portStr = url.substring(indexOfPortColon + 1, indexOfPortEnd);
+            return Integer.parseInt(portStr);
+        } catch (Exception ex) {
+            throw new MalformedURLException();
+        }
     }
 
 }

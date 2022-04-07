@@ -16,7 +16,7 @@ public class Task5 {
                 if (url.trim().isEmpty()) {
                     isInterrupted = true;
                 } else try {
-                    printUrlInfo(url,UrlMatcher.getUrlInfo(url));
+                    printUrlInfo(url, UrlMatcher.getUrlInfo(url));
                 } catch (MalformedURLException ex) {
                     System.out.println("This is not url");
                 }
@@ -24,7 +24,7 @@ public class Task5 {
         }
     }
 
-    private static void printUrlInfo(String url,UrlInfo info) {
+    private static void printUrlInfo(String url, UrlInfo info) {
         System.out.println(url);
         System.out.println("PROTOCOL: " + info.protocol);
         System.out.println("HOST: " + info.host);

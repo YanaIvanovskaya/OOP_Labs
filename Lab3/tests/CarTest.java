@@ -1,6 +1,7 @@
 import Car.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class CarTest {
@@ -13,6 +14,7 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("Созданная машина должна иметь скорость 0, нейтральную передачу и заглушенный двигатель")
     void createCar() {
         Car car = Car.createCar();
         Assertions.assertEquals(Car.Direction.STAND, car.getDirection());
@@ -22,6 +24,7 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("При выключении двигателя машина должна выключиться")
     void turnOffEngine() {
         testCar.turnOnEngine();
         Assertions.assertDoesNotThrow(testCar::turnOffEngine);
@@ -29,6 +32,7 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("При создании кастомной машины она должна быть в валидном состоянии")
     void test_custom_car_creation() {
         for (int i = 0; i < 151; i++) {
             Car car = getDrivenCarWithSpeed(i);
@@ -71,18 +75,21 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("При включении двигателя машина должна завестись")
     void turnOnEngine() {
         Assertions.assertDoesNotThrow(testCar::turnOnEngine);
         Assertions.assertTrue(testCar.isTurnedOn());
     }
 
     @Test
+    @DisplayName("При передаче != NEUTRAL или скорости != 0 выключить двигатель нельзя")
     void case_turn_off_if_gear_not_neutral_and_speed_not_zero() {
         Car car = getDrivenCarWithSpeed(10);
         Assertions.assertThrows(EngineControlException.class, car::turnOffEngine);
     }
 
     @Test
+    @DisplayName("При установке скорости машина на передаче != REVERSE должна двигаться с этой скоростью вперед")
     void setSpeed() {
         Car car = getDrivenCarWithSpeed(5);
         Assertions.assertDoesNotThrow(() -> car.setSpeed(5));
@@ -91,6 +98,7 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("При установке скорости == 0 машина должна остановиться")
     void case_set_speed_zero() {
         Car car = getDrivenCarWithSpeed(0);
         Assertions.assertDoesNotThrow(() -> car.setSpeed(0));
@@ -99,12 +107,14 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("Установить отрицательную скорость нельзя")
     void case_set_negative_speed() {
         Car car = getDrivenCarWithSpeed(0);
         Assertions.assertThrows(SpeedControlException.class, () -> car.setSpeed(-2));
     }
 
     @Test
+    @DisplayName("При установке скорости на задней передаче машина должна двигаться с этой скоростью назад")
     void case_set_speed_if_gear_is_reverse() {
         testCar.turnOnEngine();
         testCar.setGear(Car.Gear.REVERSE);
@@ -114,6 +124,7 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("Ускорение на нейтральной передаче невозможно")
     void case_set_speed_if_gear_is_neutral() {
         Car car = getDrivenCarWithSpeed(3);
         car.setGear(Car.Gear.NEUTRAL);
@@ -122,6 +133,7 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("Установка скорости больше максимальной невозможна")
     void case_set_speed_more_than_150() {
         Car car = getDrivenCarWithSpeed(90);
         Assertions.assertThrows(SpeedControlException.class, () -> car.setSpeed(200));
@@ -129,6 +141,7 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("Нельзя задать скорость не в диапазоне текущей передачи")
     void case_set_speed_if_it_not_in_range_of_gear() {
         Car car = getDrivenCarWithSpeed(35);
         Assertions.assertThrows(SpeedControlException.class, () -> car.setSpeed(90));
@@ -136,12 +149,14 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("Нельзя задать скорость, если двигатель выключен")
     void case_set_speed_if_engine_is_turn_off() {
         Assertions.assertThrows(SpeedControlException.class, () -> testCar.setSpeed(15));
         Assertions.assertEquals(0, testCar.getSpeed());
     }
 
     @Test
+    @DisplayName("При переключении передачи машина должна двигаться на этой передаче")
     void setGear() {
         Car car = getDrivenCarWithSpeed(25);
         Assertions.assertDoesNotThrow(() -> car.setGear(Car.Gear.TWO));
@@ -149,12 +164,14 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("Нельзя переключить передачу, если двигатель выключен")
     void case_set_gear_if_engine_turn_off() {
         Assertions.assertThrows(GearControlException.class, () -> testCar.setGear(Car.Gear.ONE));
         Assertions.assertEquals(Car.Gear.NEUTRAL, testCar.getGear());
     }
 
     @Test
+    @DisplayName("Нельзя переключить передачу, если текущая скорость не входит в ее диапазон")
     void case_set_gear_if_current_speed_not_in_range() {
         Car car = getDrivenCarWithSpeed(10);
         Assertions.assertThrows(GearControlException.class, () -> car.setGear(Car.Gear.TWO));
@@ -162,6 +179,7 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("Нельзя включить заднюю передачу, если текущая скорость != 0")
     void case_set_reverse_gear_if_speed_not_zero() {
         Car car = getDrivenCarWithSpeed(10);
         Assertions.assertThrows(GearControlException.class, () -> car.setGear(Car.Gear.REVERSE));
@@ -169,6 +187,7 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("Если скорость == 0, то можно переключиться на заднюю передачу")
     void case_set_reverse_gear_if_all_ok() {
         Car car = getDrivenCarWithSpeed(0);
         Assertions.assertDoesNotThrow(() -> car.setGear(Car.Gear.REVERSE));
@@ -176,6 +195,7 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("Нельзя переключиться с REVERSE передачи на передачу != REVERSE, если текущая скорость != 0")
     void case_set_not_reverse_gear_if_current_reverse() {
         testCar.turnOnEngine();
         testCar.setGear(Car.Gear.REVERSE);
@@ -183,9 +203,11 @@ class CarTest {
 
         Assertions.assertThrows(GearControlException.class, () -> testCar.setGear(Car.Gear.ONE));
         Assertions.assertEquals(Car.Gear.REVERSE, testCar.getGear());
+        Assertions.assertEquals(Car.Direction.BACK, testCar.getDirection());
     }
 
     @Test
+    @DisplayName("Включить заднюю передачу можно на текущей нейтральной и на скорости == 0")
     void case_set_reverse_if_current_neutral_and_speed_zero() {
         testCar.turnOnEngine();
         Assertions.assertDoesNotThrow(() -> testCar.setGear(Car.Gear.REVERSE));
@@ -193,6 +215,7 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("Нельзя включить заднюю передачу на текущей нейтральной, если текущая скорость != 0")
     void case_set_reverse_if_current_neutral_and_speed_not_zero() {
         testCar.turnOnEngine();
         testCar.setGear(Car.Gear.REVERSE);
@@ -203,7 +226,8 @@ class CarTest {
         Assertions.assertEquals(Car.Gear.NEUTRAL, testCar.getGear());
     }
 
-    @Test
+    @Test()
+    @DisplayName("На задней передаче можно включить нейтральную передачу, при этом направление движения будет назад")
     void case_set_neutral_if_current_reverse() {
         testCar.turnOnEngine();
         testCar.setGear(Car.Gear.REVERSE);
@@ -211,9 +235,11 @@ class CarTest {
 
         Assertions.assertDoesNotThrow(() -> testCar.setGear(Car.Gear.NEUTRAL));
         Assertions.assertEquals(Car.Gear.NEUTRAL, testCar.getGear());
+        Assertions.assertEquals(Car.Direction.BACK, testCar.getDirection());
     }
 
     @Test
+    @DisplayName("Можно установить нейтральную передачу, если текущая 1-5")
     void case_set_neutral_if_current_not_reverse() {
         Car car = getDrivenCarWithSpeed(5);
         Assertions.assertDoesNotThrow(() -> car.setGear(Car.Gear.NEUTRAL));
@@ -221,6 +247,7 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("Переключиться на 2 передачу нельзя при текущей нейтральной")
     void case_set_not_neutral_gear_if_current_neutral() {
         testCar.turnOnEngine();
         Assertions.assertThrows(GearControlException.class, () -> testCar.setGear(Car.Gear.TWO));
@@ -228,6 +255,7 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("При движении НАЗАД на НЕЙТРАЛЬНОЙ передаче нельзя переключиться на передачу 1-5")
     void case_set_not_neutral_gear_if_current_neutral_and_direction_back() {
         testCar.turnOnEngine();
         testCar.setGear(Car.Gear.REVERSE);
@@ -239,6 +267,19 @@ class CarTest {
     }
 
     @Test
+    @DisplayName("После переключения на нейтралку с задней передачи направление движения должно быть назад")
+    void case_set_speed_if_gear_was_switched_on_neutral_after_reverse() {
+        testCar.turnOnEngine();
+        testCar.setGear(Car.Gear.REVERSE);
+        testCar.setSpeed(15);
+        Assertions.assertEquals(Car.Direction.BACK, testCar.getDirection());
+        testCar.setGear(Car.Gear.NEUTRAL);
+        testCar.setSpeed(10);
+        Assertions.assertEquals(Car.Direction.BACK, testCar.getDirection());
+    }
+
+    @Test
+    @DisplayName("Проверка вывода информации о машине")
     void case_correct_car_info() {
         Car car = getDrivenCarWithSpeed(5);
         String expected = """
