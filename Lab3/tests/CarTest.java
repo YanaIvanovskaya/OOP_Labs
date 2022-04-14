@@ -48,7 +48,6 @@ class CarTest {
         int startSpeed = 0;
         while (startSpeed <= speed) {
             try {
-//                System.out.println(startSpeed);
                 car.setSpeed(startSpeed);
                 startSpeed++;
             } catch (SpeedControlException ex) {
