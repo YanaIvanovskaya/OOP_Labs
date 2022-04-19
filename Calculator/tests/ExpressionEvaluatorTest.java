@@ -29,7 +29,7 @@ class ExpressionEvaluatorTest {
     @DisplayName("При обращении к необъявленной переменной выбрасывается исключение")
     void case_2() {
         expressions.add(new Expression.Declaration("qwerty"));
-        expressions.add(new Expression.Initialization("foo", "boo"));
+        expressions.add(new Expression.Initialization("foo", "boo", Expression.Initialization.ValueType.IDENTIFIER));
 
         Assertions.assertThrows(SemanticException.class, () -> ExpressionEvaluator.evaluate(expressions));
     }

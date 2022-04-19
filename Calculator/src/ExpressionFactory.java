@@ -50,7 +50,9 @@ public final class ExpressionFactory {
         if (isVarInitialization) {
             return new Expression.Initialization(
                     tokens.get(1).getValue(),
-                    tokens.get(3).getValue()
+                    tokens.get(3).getValue(),
+                    tokens.get(3) instanceof Token.Number ? Expression.Initialization.ValueType.NUMBER
+                            : Expression.Initialization.ValueType.IDENTIFIER
             );
         } else throw new SyntaxException(SyntaxError.NOT_A_STATEMENT);
     }
