@@ -121,7 +121,7 @@ public class Car {
         if (isNeutral && newSpeed > getSpeed())
             throw new SpeedControlException(SpeedControlError.NEUTRAL_GEAR);
 
-        this.mSpeed = switch (mGear) {
+        mSpeed = switch (mGear) {
             case REVERSE -> -newSpeed;
             case NEUTRAL -> this.mSpeed > 0 ? newSpeed : -newSpeed;
             default -> newSpeed;

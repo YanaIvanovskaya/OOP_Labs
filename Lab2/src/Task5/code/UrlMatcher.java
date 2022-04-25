@@ -28,7 +28,7 @@ final class UrlMatcher {
             if (port == null) {
                 return isMatchesPattern;
             } else {
-                return isMatchesPattern && port >= 1 && port <= 65535;
+                return isMatchesPattern && port >= 0 && port <= 65535;
             }
         } catch (MalformedURLException ex) {
             return false;
@@ -40,6 +40,7 @@ final class UrlMatcher {
             throw new MalformedURLException();
         }
 
+        //
         Matcher protocolMatcher = Pattern.compile(protocolRegex).matcher(url);
         Protocol protocol = protocolMatcher.find() ?
                 Protocol.fromString(protocolMatcher.group()) : Protocol.UNKNOWN;

@@ -24,21 +24,18 @@ public final class ExpressionEvaluator {
                 switch (expInit.type()) {
                     case NUMBER -> result.put(exp, Double.parseDouble(expInit.value()));
                     case IDENTIFIER -> {
-                        filterVariables(expressions.subList(0, i))
+                        Expression.Variable value = filterVariables(expressions.subList(0, i))
                                 .stream()
                                 .filter((e) -> e.getName().equals(expInit.getValue()))
                                 .findFirst()
-                        .get()
-                        .getValue();
+                                .orElse(null);
+
                     }
                 }
             } else {
                 System.out.println("unreachable");
             }
-
         }
-
-
     }
 
     private static void checkSemantic(List<Expression> expressions) throws SemanticException {
