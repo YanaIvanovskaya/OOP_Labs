@@ -1,5 +1,5 @@
 sealed interface Value {
     object Void : Value
-    object Nan : Value
+    object NaN : Value
     data class Number(val value: Double) : Value
 }
