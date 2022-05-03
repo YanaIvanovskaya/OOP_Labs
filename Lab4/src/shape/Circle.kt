@@ -26,12 +26,12 @@ data class Circle(
     }
 
     override fun draw(canvas: ICanvas) {
-       // canvas.drawCircle(center, radius, outlineColor)
-        canvas.fillCircle(center, radius, outlineColor)
+        canvas.fillCircle(center, radius, fillColor)
+        canvas.drawCircle(center, radius, outlineColor)
     }
 
     override fun toString(): String {
-        return "shape.Circle (center=(${center.x},${center.y}, radius=$radius)"
+        return "shape.Circle (center=(${center.x},${center.y}), radius=$radius)"
     }
 
 }

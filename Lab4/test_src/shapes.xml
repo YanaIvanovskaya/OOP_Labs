@@ -1,0 +1,38 @@
+<shapes>
+
+    <rectangle
+            width="300"
+            height="200"
+            left_top_x='-150.70'
+            left_top_y='0.23'
+            outline_color='#121212'
+            fill_color='#909090'/>
+
+    <circle
+            radius='100'
+            center_x='30'
+            center_y='12'
+            outline_color='#222222'
+            fill_color='#665544'/>
+
+    <triangle
+            vertex1_x='10'
+            vertex1_y='12'
+            vertex2_x='60'
+            vertex2_y='2'
+            vertex3_x='70'
+            vertex3_y='92'
+            outline_color='#FFF455'
+            fill_color='#662222'/>
+
+    <line
+            outline_color='#000565'
+            start_x='70'
+            start_y='45'
+            end_x='34'
+            end_y='88'/>
+
+</shapes>
+
+
+

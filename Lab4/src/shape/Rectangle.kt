@@ -35,8 +35,8 @@ data class Rectangle(
             val rightBottom = Point(leftTop.x + width, leftTop.y - height)
             mPoints.add(leftTop)
             mPoints.add(rightTop)
-            mPoints.add(leftBottom)
             mPoints.add(rightBottom)
+            mPoints.add(leftBottom)
         }
         canvas.fillPolygon(mPoints, fillColor)
         canvas.drawPolygon(mPoints, outlineColor)

@@ -10,6 +10,8 @@ import java.awt.Color
 import java.io.StringReader
 import javax.xml.parsers.DocumentBuilderFactory
 
+class ParserException(val description: String) : Throwable()
+
 class ShapeXMLParser {
 
     fun parse(source: String): List<IShape> {
@@ -21,16 +23,16 @@ class ShapeXMLParser {
 
         val rootNode = document.firstChild
         if (rootNode.nodeName != "shapes") {
-            throw ParserException(ErrorType.INVALID_ROOT_ELEMENT, "Expected root element <shapes></shapes>")
+            throw ParserException("Expected root element <shapes></shapes>")
         }
 
         val shapes = mutableListOf<IShape>()
         val childNodes = rootNode.childNodes
         for (index in 0 until childNodes.length) {
             val child = childNodes.item(index)
-            if (child.nodeType == Node.TEXT_NODE) continue
-
-            shapes.add(createShapeFromNode(child))
+            if (child.nodeType != Node.TEXT_NODE) {
+                shapes.add(createShapeFromNode(child))
+            }
         }
         return shapes
     }
@@ -41,83 +43,106 @@ class ShapeXMLParser {
             val xml = InputSource(StringReader(source))
             return docBuilder.parse(xml)
         } catch (ex: Throwable) {
-            throw ParserException(ErrorType.INVALID_XML_FILE, "The source is not valid XML")
+            throw ParserException("The source is not valid XML")
         }
     }
 
     private fun createShapeFromNode(node: Node): IShape {
         val attrs = node.attributes
 
-        val outlineColor = runCatching {
-            Color.decode(attrs.getAttributeByName("outline_color"))
-        }.getOrElse { throw ParserException(ErrorType.INCORRECT_COLOR, "Incorrect color") }
+        val shapeXML = if (node.nodeName !in ShapeXML.availableShapes) {
+            throw ParserException("Unexpected tag: ${node.nodeName}")
+        } else ShapeXML.getShapeByTag(node.nodeName)
 
-        val fillColor = runCatching {
-            val hexColor = attrs.getAttributeByName("fill_color")
-            hexColor ?: return@runCatching Color.BLACK
-            Color.decode(hexColor)
-        }.getOrElse { throw ParserException(ErrorType.INCORRECT_COLOR, "Incorrect color") }
+        ensureRequiredAttributes(attrs, shapeXML)
+        ensureExpectedAttributes(attrs, shapeXML)
 
-        return when (node.nodeName) {
-            "rectangle" -> {
-                if (attrs.length != 6) {
-                    val msg = "Tag <rectangle> expected 6 required attributes"
-                    throw ParserException(ErrorType.INCORRECT_NUMBER_OF_ATTRIBUTES, msg)
-                }
-                val leftTop = createPoint(attrs, "left_top_x", "left_top_y")
-                Rectangle(
-                    outlineColor = outlineColor,
-                    fillColor = fillColor,
-                    leftTop = leftTop,
-                    width = attrs.getDoubleAttributeByName("width"),
-                    height = attrs.getDoubleAttributeByName("height")
-                )
-            }
-            "circle" -> {
-                if (attrs.length != 5) {
-                    val msg = "Tag <circle> expected 5 required attributes"
-                    throw ParserException(ErrorType.INCORRECT_NUMBER_OF_ATTRIBUTES, msg)
-                }
-                val center = createPoint(attrs, "center_x", "center_y")
-                Circle(
-                    center = center,
-                    outlineColor = outlineColor,
-                    fillColor = fillColor,
-                    radius = attrs.getDoubleAttributeByName("radius")
-                )
-            }
-            "triangle" -> {
-                if (attrs.length != 8) {
-                    val msg = "Tag <triangle> expected 8 required attributes"
-                    throw ParserException(ErrorType.INCORRECT_NUMBER_OF_ATTRIBUTES, msg)
-                }
-                val vertex1 = createPoint(attrs, "vertex1_x", "vertex1_y")
-                val vertex2 = createPoint(attrs, "vertex2_x", "vertex2_y")
-                val vertex3 = createPoint(attrs, "vertex3_x", "vertex3_y")
-                Triangle(
-                    outlineColor = outlineColor,
-                    fillColor = fillColor,
-                    vertex1 = vertex1,
-                    vertex2 = vertex2,
-                    vertex3 = vertex3
-                )
-            }
-            "line" -> {
-                if (attrs.length != 5) {
-                    val msg = "Tag <line> expected 5 required attributes"
-                    throw ParserException(ErrorType.INCORRECT_NUMBER_OF_ATTRIBUTES, msg)
-                }
-                val start = createPoint(attrs, "start_x", "start_y")
-                val end = createPoint(attrs, "end_x", "end_y")
-                LineSegment(
-                    start = start,
-                    end = end,
-                    outlineColor = outlineColor
-                )
-            }
-            else -> throw ParserException(ErrorType.UNSUPPORTED_SHAPE, "Unexpected tag: ${node.nodeName}")
+        val outlineColor = getOutlineColor(attrs)
+        val fillColor = getFillColor(attrs)
+
+        return when (shapeXML) {
+            ShapeXML.Circle -> createCircle(attrs, outlineColor, fillColor)
+            ShapeXML.Rectangle -> createRectangle(attrs, outlineColor, fillColor)
+            ShapeXML.Triangle -> createTriangle(attrs, outlineColor, fillColor)
+            ShapeXML.Line -> createLine(attrs, outlineColor)
         }
     }
+
+    private fun ensureRequiredAttributes(attrs: NamedNodeMap, shapeXML: ShapeXML) {
+        if (attrs.length < shapeXML.countOfRequired) {
+            val msg = "Tag <${shapeXML.tag}> expected ${shapeXML.countOfRequired} required attributes"
+            throw ParserException(msg)
+        }
+    }
+
+    private fun ensureExpectedAttributes(attrs: NamedNodeMap, shapeXML: ShapeXML) {
+        for (index in 0 until attrs.length) {
+            println(attrs.item(index).nodeName)
+            println(attrs.item(index).nodeValue)
+        }
+    }
+
+    private fun getOutlineColor(attrs: NamedNodeMap): Color {
+        var hexColor = ""
+        return runCatching {
+            hexColor = attrs.getAttributeByName(ShapeXML.OUTLINE_COLOR)
+                ?: return@runCatching Color.BLACK
+            Color.decode(hexColor)
+        }.getOrElse { throw ParserException("Incorrect outline color - $hexColor") }
+    }
+
+    private fun getFillColor(attrs: NamedNodeMap): Color {
+        var hexColor = ""
+        return runCatching {
+            hexColor = attrs.getAttributeByName(ShapeXML.FILL_COLOR)
+                ?: return@runCatching Color.BLACK
+            Color.decode(hexColor)
+        }.getOrElse { throw ParserException("Incorrect fill color - $hexColor") }
+    }
+
+    private fun createTriangle(
+        attrs: NamedNodeMap,
+        outlineColor: Color,
+        fillColor: Color
+    ) = Triangle(
+        outlineColor = outlineColor,
+        fillColor = fillColor,
+        vertex1 = createPoint(attrs, ShapeXML.Triangle.vertex1X, ShapeXML.Triangle.vertex1Y),
+        vertex2 = createPoint(attrs, ShapeXML.Triangle.vertex2X, ShapeXML.Triangle.vertex2Y),
+        vertex3 = createPoint(attrs, ShapeXML.Triangle.vertex3X, ShapeXML.Triangle.vertex3Y)
+    )
+
+    private fun createLine(
+        attrs: NamedNodeMap,
+        outlineColor: Color
+    ) = LineSegment(
+        start = createPoint(attrs, ShapeXML.Line.startX, ShapeXML.Line.startY),
+        end = createPoint(attrs, ShapeXML.Line.endX, ShapeXML.Line.endY),
+        outlineColor = outlineColor
+    )
+
+    private fun createRectangle(
+        attrs: NamedNodeMap,
+        outlineColor: Color,
+        fillColor: Color
+    ) = Rectangle(
+        outlineColor = outlineColor,
+        fillColor = fillColor,
+        leftTop = createPoint(attrs, ShapeXML.Rectangle.leftTopX, ShapeXML.Rectangle.leftTopY),
+        width = attrs.getDoubleAttributeByName(ShapeXML.Rectangle.width),
+        height = attrs.getDoubleAttributeByName(ShapeXML.Rectangle.height)
+    )
+
+    private fun createCircle(
+        attrs: NamedNodeMap,
+        outlineColor: Color,
+        fillColor: Color
+    ) = Circle(
+        center = createPoint(attrs, ShapeXML.Circle.centerX, ShapeXML.Circle.centerY),
+        outlineColor = outlineColor,
+        fillColor = fillColor,
+        radius = attrs.getDoubleAttributeByName(ShapeXML.Circle.radius)
+    )
 
     private fun createPoint(
         attrs: NamedNodeMap,
@@ -129,24 +154,13 @@ class ShapeXMLParser {
     )
 
     private fun NamedNodeMap.getAttributeByName(name: String): String? {
-        return getNamedItem(name)?.childNodes?.item(0)?.textContent
+        return getNamedItem(name)?.nodeValue
     }
 
     private fun NamedNodeMap.getDoubleAttributeByName(name: String): Double {
         return runCatching {
             getAttributeByName(name)?.toDouble() ?: 0.0
-        }.getOrElse { throw ParserException(ErrorType.INCORRECT_NUMBER, "Attribute $name expected type number") }
-    }
-
-    class ParserException(val type: ErrorType, val description: String) : Throwable()
-
-    enum class ErrorType {
-        UNSUPPORTED_SHAPE,
-        INVALID_ROOT_ELEMENT,
-        INVALID_XML_FILE,
-        INCORRECT_NUMBER_OF_ATTRIBUTES,
-        INCORRECT_NUMBER,
-        INCORRECT_COLOR
+        }.getOrElse { throw ParserException("Attribute $name expected type number") }
     }
 
 }

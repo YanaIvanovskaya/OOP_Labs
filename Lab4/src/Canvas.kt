@@ -19,7 +19,7 @@ class Canvas : ICanvas {
 
     override fun fillCircle(center: Point, radius: Double, fillColor: Color) = with(mDraw) {
         penColor = fillColor
-        circle(center.x, center.y, radius)
+        filledCircle(center.x, center.y, radius)
     }
 
     override fun drawCircle(center: Point, radius: Double, outlineColor: Color) = with(mDraw) {
@@ -29,7 +29,7 @@ class Canvas : ICanvas {
 
     override fun fillPolygon(points: Vector<Point>, fillColor: Color) = with(mDraw) {
         penColor = fillColor
-        polygon(points.map { it.x }.toDoubleArray(), points.map { it.y }.toDoubleArray())
+        filledPolygon(points.map { it.x }.toDoubleArray(), points.map { it.y }.toDoubleArray())
     }
 
     override fun drawPolygon(points: Vector<Point>, outlineColor: Color) = with(mDraw) {

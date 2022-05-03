@@ -30,7 +30,7 @@ internal class ShapeXMLParserTest {
                     end_y='88'/>
             </tag>
         """
-        Assertions.assertThrows(ShapeXMLParser.ParserException::class.java) {
+        Assertions.assertThrows(ParserException::class.java) {
             parser.parse(xml)
         }
     }
@@ -48,7 +48,7 @@ internal class ShapeXMLParserTest {
                     end_y='88'/>
             </shapes>
         """
-        Assertions.assertThrows(ShapeXMLParser.ParserException::class.java) {
+        Assertions.assertThrows(ParserException::class.java) {
             parser.parse(xml)
         }
     }
@@ -159,12 +159,11 @@ internal class ShapeXMLParserTest {
     }
 
     @Test
-    @DisplayName("Если указаны не все атрибуты или указаны лишние/неизвестные атрибуты, выбрасывается исключение")
+    @DisplayName("Если указаны не все обязательные атрибуты или указаны лишние/неизвестные атрибуты, выбрасывается исключение")
     fun case_8() {
         val xml = """
             <shapes>
                 <line
-                    outline_color='#000565'
                     width='12'
                     start_x='70'
                     start_y='45'
@@ -173,7 +172,7 @@ internal class ShapeXMLParserTest {
                 />
             </shapes>
         """
-        Assertions.assertThrows(ShapeXMLParser.ParserException::class.java) {
+        Assertions.assertThrows(ParserException::class.java) {
             parser.parse(xml)
         }
     }
@@ -192,7 +191,7 @@ internal class ShapeXMLParserTest {
                 />
             </shapes>
         """
-        Assertions.assertThrows(ShapeXMLParser.ParserException::class.java) {
+        Assertions.assertThrows(ParserException::class.java) {
             parser.parse(xml)
         }
     }

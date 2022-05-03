@@ -28,4 +28,10 @@ internal class CircleTest {
         Assertions.assertEquals(expected, testShape.getArea())
     }
 
+    @Test
+    @DisplayName("Рисование")
+    fun case_3() {
+
+    }
+
 }

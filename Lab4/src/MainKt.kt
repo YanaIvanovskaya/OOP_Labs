@@ -1,105 +1,77 @@
 import java.awt.Color
+import java.io.File
+import java.text.DecimalFormat
 import java.util.*
 
 fun main() {
 
-    val result = ShapeXMLParser().parse(
-        """
-        <shapes>
-        
-            <rectangle 
-                width='30'
-                height='20'
-                left_top_x='-150.70'
-                left_top_y='0.23'
-                outline_color='#121212'
-                fill_color='#909090'
-            />
-            
-            <circle
-                radius='100'
-                center_x='30'
-                center_y='12'
-                outline_color='#222222'
-                fill_color='#665544'/>
-                
-            <triangle
-                vertex1_x='10'
-                vertex1_y='12'
-                vertex2_x='60'
-                vertex2_y='2'
-                vertex3_x='70'
-                vertex3_y='92'
-                outline_color='#FFF455'
-                fill_color='#662222'/>
-                
-                
-            <line
-                outline_color='#000565'
-                start_x='70'
-                start_y='45'
-                end_x='34'
-                end_y='88'/>
-          
-        </shapes>
+//    readShapesFromConsole()
 
-    """.trimIndent()
-    )
+    readShapesFromFile()
 
-    readShapesFromConsole()
+    //C:\Users\yana-\All_Projects_Intellij_Idea\OOP_Labs\Lab4\test_src\shapes.xml
 
 }
 
-fun readShapesFromConsole() {
-    val parser = ShapeXMLParser()
-    val canvas = Canvas()
-    println("Enter the shape description:")
-    getUserInput {
-        try {
-            val shapes = parser.parse(it)
-            if (shapes.isEmpty()) {
-                println("No description")
-                return@getUserInput
-            }
-            println("Shape with biggest area:")
-            printShapeInfo(findShapeWithBiggestArea(shapes))
-            println(" --- ")
-            println("Shape with smallest perimeter:")
-            printShapeInfo(findShapeWithSmallestPerimeter(shapes))
+private fun readShapesFromFile() {
+    println("Enter the filepath:")
+    Scanner(System.`in`).use { userInput ->
+        val filepath = userInput.nextLine()
+        if (filepath.isEmpty()) return
 
-            //canvas.clear()
-            shapes.forEach { shape ->
-                (shape as? ICanvasDrawable)?.draw(canvas)
-            }
+        val shapesDescription = StringBuilder()
 
-        } catch (ex: ShapeXMLParser.ParserException) {
-            println(ex.description)
-        }
+        runCatching {
+            Scanner(File(filepath)).use {
+                while (it.hasNext()) {
+                    shapesDescription.append("\n").append(it.next())
+                }
+            }
+            processShapeDescription(shapesDescription.toString())
+        }.getOrElse { println("File not found or cannot be read") }
     }
 }
 
-//fun readShapesFromFile() {
-//    val parser = ShapeXMLParser()
-//    println("Enter the filepath:")
-//
-//    getUserInput {
-//        try {
-//            val shapes = parser.parse(it)
-//            if (shapes.isEmpty()) {
-//                println("No description found in file")
-//                return@getUserInput
-//            }
-//            println("Shape with biggest area:")
-//            printShapeInfo(findShapeWithBiggestArea(shapes))
-//            println(" --- ")
-//            println("Shape with smallest perimeter:")
-//            printShapeInfo(findShapeWithSmallestPerimeter(shapes))
-//        } catch (ex: ShapeXMLParser.ParserException) {
-//            println(ex.description)
-//        }
-//    }
-//}
+fun processShapeDescription(description: String) {
+    val parser = ShapeXMLParser()
+    var canvas: ICanvas? = null
+    try {
+        val shapes = parser.parse(description)
+        if (shapes.isEmpty()) {
+            println("No description")
+            return
+        }
 
+        printSummary(shapes)
+
+        canvas = canvas ?: Canvas()
+        drawShapes(canvas, shapes)
+
+    } catch (ex: ParserException) {
+        println(ex.description)
+    }
+}
+
+fun readShapesFromConsole() {
+    println("Enter the shape description:")
+    getUserInput(::processShapeDescription)
+}
+
+private fun drawShapes(canvas: ICanvas, shapes: List<IShape>) {
+    canvas.clear()
+    shapes.forEach { shape ->
+        (shape as? ICanvasDrawable)?.draw(canvas)
+    }
+}
+
+private fun printSummary(shapes: List<IShape>) {
+    val formatter = DecimalFormat("#.###")
+    println("Shape with biggest area:")
+    printShapeInfo(findShapeWithBiggestArea(shapes), formatter)
+    println(" --- ")
+    println("Shape with smallest perimeter:")
+    printShapeInfo(findShapeWithSmallestPerimeter(shapes), formatter)
+}
 
 fun findShapeWithSmallestPerimeter(shapes: List<IShape>): IShape? {
     return shapes.minByOrNull {
@@ -125,11 +97,11 @@ private fun getUserInput(onEach: (String) -> Unit) {
     }
 }
 
-private fun printShapeInfo(shape: IShape?) {
+private fun printShapeInfo(shape: IShape?, formatter: DecimalFormat) {
     shape ?: return
     println(shape)
-    println("Area: ${shape.getArea()}")
-    println("Perimeter: ${shape.getPerimeter()}")
+    println("Area: ${formatter.format(shape.getArea())}")
+    println("Perimeter: ${formatter.format(shape.getPerimeter())}")
     (shape as? ISolidShape)?.let {
         println("Fill color: ${it.getFillColor().toHexString()}")
     }
@@ -137,3 +109,4 @@ private fun printShapeInfo(shape: IShape?) {
 }
 
 private fun Color.toHexString() = "#${Integer.toHexString(rgb).drop(2).uppercase()}"
+
