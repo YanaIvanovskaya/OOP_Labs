@@ -1,26 +1,21 @@
-data class Attribute(
-    val name: String,
-    val isRequired: Boolean
-)
-
 sealed class ShapeXML(val tag: String) {
 
-    abstract val attrs: List<Attribute>
+    abstract val attrs: Map<String, Boolean>
 
     val countOfRequired
-        get() = attrs.filter { it.isRequired }.count()
+        get() = attrs.filter { it.value }.count()
 
     object Circle : ShapeXML(CIRCLE) {
         const val centerX = "center_x"
         const val centerY = "center_y"
         const val radius = "radius"
 
-        override val attrs = listOf(
-            Attribute(centerX, true),
-            Attribute(centerY, true),
-            Attribute(radius, true),
-            Attribute(FILL_COLOR, false),
-            Attribute(OUTLINE_COLOR, false)
+        override val attrs = mapOf(
+            centerX to true,
+            centerY to true,
+            radius to true,
+            FILL_COLOR to false,
+            OUTLINE_COLOR to false
         )
     }
 
@@ -30,13 +25,13 @@ sealed class ShapeXML(val tag: String) {
         const val width = "width"
         const val height = "height"
 
-        override val attrs = listOf(
-            Attribute(leftTopX, true),
-            Attribute(leftTopY, true),
-            Attribute(width, true),
-            Attribute(height, true),
-            Attribute(FILL_COLOR, false),
-            Attribute(OUTLINE_COLOR, false)
+        override val attrs = mapOf(
+            leftTopX to true,
+            leftTopY to true,
+            width to true,
+            height to true,
+            FILL_COLOR to false,
+            OUTLINE_COLOR to false
         )
     }
 
@@ -48,30 +43,30 @@ sealed class ShapeXML(val tag: String) {
         const val vertex3X = "vertex3_x"
         const val vertex3Y = "vertex3_y"
 
-        override val attrs = listOf(
-            Attribute(vertex1X, true),
-            Attribute(vertex1Y, true),
-            Attribute(vertex2X, true),
-            Attribute(vertex2Y, true),
-            Attribute(vertex3X, true),
-            Attribute(vertex3Y, true),
-            Attribute(FILL_COLOR, false),
-            Attribute(OUTLINE_COLOR, false)
+        override val attrs = mapOf(
+            vertex1X to true,
+            vertex1Y to true,
+            vertex2X to true,
+            vertex2Y to true,
+            vertex3X to true,
+            vertex3Y to true,
+            FILL_COLOR to false,
+            OUTLINE_COLOR to false
         )
     }
 
     object Line : ShapeXML(LINE) {
         const val startX = "start_x"
         const val startY = "start_y"
-        const val endX = "end_y"
+        const val endX = "end_x"
         const val endY = "end_y"
 
-        override val attrs = listOf(
-            Attribute(startX, true),
-            Attribute(startY, true),
-            Attribute(endX, true),
-            Attribute(endY, true),
-            Attribute(FILL_COLOR, false)
+        override val attrs = mapOf(
+            startX to true,
+            startY to true,
+            endX to true,
+            endY to true,
+            OUTLINE_COLOR to false
         )
     }
 

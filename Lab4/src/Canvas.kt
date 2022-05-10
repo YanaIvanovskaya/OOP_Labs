@@ -4,12 +4,14 @@ import javax.swing.JFrame
 
 class Canvas : ICanvas {
 
-    private val mDraw = Draw("Canvas").apply {
-        setCanvasSize(CANVAS_WIDTH.toInt(), CANVAS_HEIGHT.toInt())
-        setXscale(-CANVAS_WIDTH, CANVAS_WIDTH)
-        setYscale(-CANVAS_HEIGHT, CANVAS_HEIGHT)
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-        penRadius = 0.002
+    private val mDraw by lazy {
+        Draw("Canvas").apply {
+            setCanvasSize(CANVAS_WIDTH.toInt(), CANVAS_HEIGHT.toInt())
+            setXscale(-CANVAS_WIDTH, CANVAS_WIDTH)
+            setYscale(-CANVAS_HEIGHT, CANVAS_HEIGHT)
+            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+            penRadius = 0.002
+        }
     }
 
     override fun drawLine(from: Point, to: Point, color: Color) = with(mDraw) {
@@ -42,8 +44,8 @@ class Canvas : ICanvas {
     }
 
     companion object {
-        private const val CANVAS_HEIGHT = 600.0
-        private const val CANVAS_WIDTH = 600.0
+        private const val CANVAS_HEIGHT = 800.0
+        private const val CANVAS_WIDTH = 800.0
     }
 
 }

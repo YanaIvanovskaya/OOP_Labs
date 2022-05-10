@@ -12,9 +12,9 @@ import javax.xml.parsers.DocumentBuilderFactory
 
 class ParserException(val description: String) : Throwable()
 
-class ShapeXMLParser {
+class ShapeXMLParser : IShapeParser {
 
-    fun parse(source: String): List<IShape> {
+    override fun parse(source: String): List<IShape> {
         if (source.isEmpty()) {
             return listOf()
         }
@@ -42,7 +42,7 @@ class ShapeXMLParser {
             val docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
             val xml = InputSource(StringReader(source))
             return docBuilder.parse(xml)
-        } catch (ex: Throwable) {
+        } catch (ex: Exception) {
             throw ParserException("The source is not valid XML")
         }
     }
@@ -70,15 +70,20 @@ class ShapeXMLParser {
 
     private fun ensureRequiredAttributes(attrs: NamedNodeMap, shapeXML: ShapeXML) {
         if (attrs.length < shapeXML.countOfRequired) {
-            val msg = "Tag <${shapeXML.tag}> expected ${shapeXML.countOfRequired} required attributes"
+            val msg =
+                "Tag <${shapeXML.tag}> expected ${shapeXML.countOfRequired} required attributes: " +
+                        "${shapeXML.attrs.filter { it.value }.keys}"
             throw ParserException(msg)
         }
     }
 
     private fun ensureExpectedAttributes(attrs: NamedNodeMap, shapeXML: ShapeXML) {
+        val expectedAttrs = shapeXML.attrs.keys
         for (index in 0 until attrs.length) {
-            println(attrs.item(index).nodeName)
-            println(attrs.item(index).nodeValue)
+            val attr = attrs.item(index)
+            if (attr.nodeName !in expectedAttrs) {
+                throw ParserException("Unexpected attribute for shape ${shapeXML.tag} - ${attr.nodeName}")
+            }
         }
     }
 
@@ -86,7 +91,7 @@ class ShapeXMLParser {
         var hexColor = ""
         return runCatching {
             hexColor = attrs.getAttributeByName(ShapeXML.OUTLINE_COLOR)
-                ?: return@runCatching Color.BLACK
+                ?: return@runCatching DEFAULT_OUTLINE_COLOR
             Color.decode(hexColor)
         }.getOrElse { throw ParserException("Incorrect outline color - $hexColor") }
     }
@@ -95,7 +100,7 @@ class ShapeXMLParser {
         var hexColor = ""
         return runCatching {
             hexColor = attrs.getAttributeByName(ShapeXML.FILL_COLOR)
-                ?: return@runCatching Color.BLACK
+                ?: return@runCatching DEFAULT_FILL_COLOR
             Color.decode(hexColor)
         }.getOrElse { throw ParserException("Incorrect fill color - $hexColor") }
     }
@@ -161,6 +166,11 @@ class ShapeXMLParser {
         return runCatching {
             getAttributeByName(name)?.toDouble() ?: 0.0
         }.getOrElse { throw ParserException("Attribute $name expected type number") }
+    }
+
+    companion object {
+        private val DEFAULT_FILL_COLOR = Color(0, 0, 0, 0)
+        private val DEFAULT_OUTLINE_COLOR = Color.BLACK
     }
 
 }

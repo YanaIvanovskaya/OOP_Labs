@@ -1,8 +1,16 @@
 import java.awt.Color
 
-interface IShape {
-    fun getArea(): Double
-    fun getPerimeter(): Double
-    fun getOutlineColor(): Color
-    override fun toString(): String
+abstract class IShape : ICanvasDrawable {
+    abstract fun getArea(): Double
+    abstract fun getPerimeter(): Double
+    abstract fun getOutlineColor(): Color
+    abstract fun stringify(): String
+    final override fun toString(): String {
+        return stringify()
+    }
+
+    companion object {
+        const val DEFAULT = -1.0
+    }
+
 }

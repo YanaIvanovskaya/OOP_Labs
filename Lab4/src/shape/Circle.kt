@@ -1,24 +1,25 @@
 package shape
 
 import ICanvas
-import ICanvasDrawable
 import ISolidShape
 import Point
 import java.awt.Color
 import kotlin.math.PI
+import kotlin.math.pow
 
+// обычный класс
 data class Circle(
     private val outlineColor: Color,
     private val fillColor: Color,
     private val center: Point,
     private val radius: Double
-) : ISolidShape, ICanvasDrawable {
+) : ISolidShape() {
 
     override fun getFillColor() = fillColor
     override fun getOutlineColor() = outlineColor
 
     override fun getArea(): Double {
-        return PI * radius * radius
+        return PI * radius.pow(2)
     }
 
     override fun getPerimeter(): Double {
@@ -30,8 +31,8 @@ data class Circle(
         canvas.drawCircle(center, radius, outlineColor)
     }
 
-    override fun toString(): String {
-        return "shape.Circle (center=(${center.x},${center.y}), radius=$radius)"
+    override fun stringify(): String {
+        return "Circle (center=(${center.x},${center.y}), radius=$radius)"
     }
 
 }

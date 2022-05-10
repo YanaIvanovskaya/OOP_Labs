@@ -1,0 +1,249 @@
+<shapes>
+
+    <rectangle
+            width="80"
+            height="50"
+            left_top_x="-40"
+            left_top_y="200"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <circle
+            center_x="0"
+            center_y="300"
+            radius="120"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <rectangle
+            width="280"
+            height="120"
+            left_top_x="-140"
+            left_top_y="170"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <circle
+            center_x="-155"
+            center_y="130"
+            radius="40"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <circle
+            center_x="155"
+            center_y="130"
+            radius="40"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <rectangle
+            width="200"
+            height="60"
+            left_top_x="-380"
+            left_top_y="160"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <rectangle
+            width="200"
+            height="60"
+            left_top_x="180"
+            left_top_y="160"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <circle
+            center_x="-380"
+            center_y="130"
+            radius="40"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <circle
+            center_x="380"
+            center_y="130"
+            radius="40"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <circle
+            center_x="380"
+            center_y="330"
+            radius="30"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <rectangle
+            width="50"
+            height="180"
+            left_top_x="355"
+            left_top_y="320"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <rectangle
+            width="100"
+            height="30"
+            left_top_x="395"
+            left_top_y="350"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <circle
+            center_x="-380"
+            center_y="330"
+            radius="30"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <rectangle
+            width="50"
+            height="180"
+            left_top_x="-405"
+            left_top_y="320"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <rectangle
+            width="100"
+            height="30"
+            left_top_x="-495"
+            left_top_y="350"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <triangle
+            vertex1_x="0"
+            vertex1_y="-100"
+            vertex2_x="-140"
+            vertex2_y="50"
+            vertex3_x="140"
+            vertex3_y="50"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <triangle
+            vertex1_x="0"
+            vertex1_y="90"
+            vertex2_x="-100"
+            vertex2_y="-100"
+            vertex3_x="100"
+            vertex3_y="-100"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <rectangle
+            width="200"
+            height="90"
+            left_top_x="-100"
+            left_top_y="-100"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <circle
+            center_x="-100"
+            center_y="-190"
+            radius="50"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <circle
+            center_x="100"
+            center_y="-190"
+            radius="50"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <rectangle
+            width="60"
+            height="200"
+            left_top_x="-130"
+            left_top_y="-220"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <rectangle
+            width="60"
+            height="200"
+            left_top_x="70"
+            left_top_y="-220"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <circle
+            center_x="-100"
+            center_y="-390"
+            radius="50"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <circle
+            center_x="100"
+            center_y="-390"
+            radius="50"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+
+    <rectangle
+            width="60"
+            height="200"
+            left_top_x="-130"
+            left_top_y="-420"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <rectangle
+            width="60"
+            height="200"
+            left_top_x="70"
+            left_top_y="-420"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <rectangle
+            width="160"
+            height="60"
+            left_top_x="70"
+            left_top_y="-590"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+    <rectangle
+            width="160"
+            height="60"
+            left_top_x="-230"
+            left_top_y="-590"
+            fill_color="#000000"
+            outline_color="#000000"
+    />
+
+</shapes>

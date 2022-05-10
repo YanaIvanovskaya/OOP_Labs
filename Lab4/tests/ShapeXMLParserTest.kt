@@ -10,6 +10,7 @@ import java.awt.Color
 internal class ShapeXMLParserTest {
 
     private val parser = ShapeXMLParser()
+    private val defaultColor = Color(0, 0, 0, 0)
 
     @Test
     @DisplayName("Если передано пустое описание фигур, вернется пустой список фигур")
@@ -196,24 +197,95 @@ internal class ShapeXMLParserTest {
         }
     }
 
-//    @Test
-//    @DisplayName("Если для атрибута указано невалидное значение, выбрасывается исключение")
-//    fun case_10() {
-//        val xml = """
-//            <shapes>
-//                <line
-//                    outline_color='#000565'
-//                    width='#454545'
-//                    start_x='70'
-//                    start_y='45'
-//                    end_x='34'
-//                    end_y='88'
-//                />
-//            </shapes>
-//        """
-//        Assertions.assertThrows(ShapeXMLParser.ParserException::class.java) {
-//            parser.parse(xml)
-//        }
-//    }
+    @Test
+    @DisplayName("Если указан неизвестный атрибут, выбрасывается исключение")
+    fun case_10() {
+        val xml = """
+            <shapes>
+                <line
+                    outline_color='#000565'
+                    width='34'
+                    start_x='70'
+                    start_y='45'
+                    end_x='34'
+                    end_y='88'
+                />
+            </shapes>
+        """
+        Assertions.assertThrows(ParserException::class.java) {
+            parser.parse(xml)
+        }
+    }
+
+    @Test
+    @DisplayName("Если не передан outline_color, цвет границ по умолчанию будет черный")
+    fun case_11() {
+        val xml = """
+            <shapes>
+                 <circle
+                    radius='100'
+                    center_x='30'
+                    center_y='12'
+                    fill_color='#665544'
+                />
+            </shapes>
+        """
+        val expected = listOf<IShape>(
+            Circle(
+                radius = 100.0,
+                center = Point(30.0, 12.0),
+                outlineColor = Color.BLACK,
+                fillColor = Color.decode("#665544")
+            )
+        )
+        Assertions.assertEquals(expected, parser.parse(xml))
+    }
+
+    @Test
+    @DisplayName("Если не передан fill_color, цвет заливки по умолчанию будет прозрачный")
+    fun case_12() {
+        val xml = """
+            <shapes>
+                 <circle
+                    radius='100'
+                    center_x='30'
+                    center_y='12'
+                    outline_color='#121212'
+                />
+            </shapes>
+        """
+        val expected = listOf<IShape>(
+            Circle(
+                radius = 100.0,
+                center = Point(30.0, 12.0),
+                outlineColor = Color.decode("#121212"),
+                fillColor = defaultColor
+            )
+        )
+        Assertions.assertEquals(expected, parser.parse(xml))
+    }
+
+    @Test
+    @DisplayName("Если не передан и fill_color,и outline_color, то цвет заливки по умолчанию будет прозрачный, а цвет границ черный")
+    fun case_13() {
+        val xml = """
+            <shapes>
+                 <circle
+                    radius='100'
+                    center_x='30'
+                    center_y='12'
+                />
+            </shapes>
+        """
+        val expected = listOf<IShape>(
+            Circle(
+                radius = 100.0,
+                center = Point(30.0, 12.0),
+                outlineColor = Color.BLACK,
+                fillColor = defaultColor
+            )
+        )
+        Assertions.assertEquals(expected, parser.parse(xml))
+    }
 
 }

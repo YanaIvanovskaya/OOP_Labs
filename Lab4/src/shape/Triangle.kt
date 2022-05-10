@@ -1,7 +1,6 @@
 package shape
 
 import ICanvas
-import ICanvasDrawable
 import ISolidShape
 import Point
 import java.awt.Color
@@ -15,7 +14,7 @@ data class Triangle(
     private val vertex1: Point,
     private val vertex2: Point,
     private val vertex3: Point
-) : ISolidShape, ICanvasDrawable {
+) : ISolidShape() {
 
     private val mPerimeter = DEFAULT
     private val mArea = DEFAULT
@@ -53,14 +52,10 @@ data class Triangle(
         canvas.drawPolygon(mPoints, outlineColor)
     }
 
-    override fun toString(): String {
-        return "shape.Triangle (vertex1=(${vertex1.x},${vertex1.y})," +
+    override fun stringify(): String {
+        return "Triangle (vertex1=(${vertex1.x},${vertex1.y})," +
                 " vertex2=(${vertex2.x},${vertex2.y})," +
                 " vertex3=(${vertex3.x},${vertex3.y}))"
-    }
-
-    companion object {
-        private const val DEFAULT = -1.0
     }
 
 }

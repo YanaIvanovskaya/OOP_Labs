@@ -1,7 +1,6 @@
 package shape
 
 import ICanvas
-import ICanvasDrawable
 import ISolidShape
 import Point
 import java.awt.Color
@@ -13,7 +12,7 @@ data class Rectangle(
     private val leftTop: Point,
     private val width: Double,
     private val height: Double
-) : ISolidShape, ICanvasDrawable {
+) : ISolidShape() {
 
     private val mPoints = Vector<Point>()
 
@@ -25,7 +24,7 @@ data class Rectangle(
     }
 
     override fun getPerimeter(): Double {
-        return (2 * width) + (2 * height)
+        return 2 * (width + height)
     }
 
     override fun draw(canvas: ICanvas) {
@@ -42,7 +41,7 @@ data class Rectangle(
         canvas.drawPolygon(mPoints, outlineColor)
     }
 
-    override fun toString(): String {
-        return "shape.Rectangle (leftTop=(${leftTop.x},${leftTop.y}), width=$width, height=$height)"
+    override fun stringify(): String {
+        return "Rectangle (leftTop=(${leftTop.x},${leftTop.y}), width=$width, height=$height)"
     }
 }

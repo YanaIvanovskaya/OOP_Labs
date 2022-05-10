@@ -1,6 +1,6 @@
 import java.awt.Color
 
-interface ISolidShape : IShape {
-    fun getFillColor(): Color
+abstract class ISolidShape : IShape() {
+    abstract fun getFillColor(): Color
 }
 
