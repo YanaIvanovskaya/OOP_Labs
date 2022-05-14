@@ -13,6 +13,7 @@ internal class CircleTest {
         outlineColor = Color.RED,
         fillColor = Color.GRAY
     )
+    private val mockCanvas = MockCanvas()
 
     @Test
     @DisplayName("Вычисление периметра (длины окружности)")
@@ -31,7 +32,12 @@ internal class CircleTest {
     @Test
     @DisplayName("Рисование")
     fun case_3() {
-
+        testShape.draw(mockCanvas)
+        val expected = listOf(
+            "fillCircle center=${Point(12.0, 60.0)} radius=${10.0} fillColor=${Color.GRAY}",
+            "drawCircle center=${Point(12.0, 60.0)} radius=${10.0} outlineColor=${Color.RED}"
+        )
+        Assertions.assertEquals(expected, mockCanvas.getDrawingResult())
     }
 
 }

@@ -36,9 +36,7 @@ class ShapeEvaluator(
 
         private fun drawShapes(canvas: ICanvas, shapes: List<IShape>) {
             canvas.clear()
-            shapes.forEach { shape ->
-                (shape as? ICanvasDrawable)?.draw(canvas)
-            }
+            shapes.forEach { shape -> shape.draw(canvas) }
         }
 
         private fun printSummary(shapes: List<IShape>) {

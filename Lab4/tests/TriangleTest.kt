@@ -15,6 +15,7 @@ internal class TriangleTest {
         outlineColor = Color.RED,
         fillColor = Color.GREEN
     )
+    private val mockCanvas = MockCanvas()
 
     @Test
     @DisplayName("Вычисление периметра")
@@ -27,9 +28,9 @@ internal class TriangleTest {
         val len23 = sqrt(vector23.x * vector23.x + vector23.y * vector23.y)
         val len31 = sqrt(vector31.x * vector31.x + vector31.y * vector31.y)
 
-        val expected =  len12 + len23 + len31
+        val expected = len12 + len23 + len31
 
-        Assertions.assertEquals(expected,testShape.getPerimeter())
+        Assertions.assertEquals(expected, testShape.getPerimeter())
     }
 
     @Test
@@ -40,5 +41,20 @@ internal class TriangleTest {
                     (120.0 - 12.0) * (7.0 - 50.0)
         )
         Assertions.assertEquals(expected, testShape.getArea())
+    }
+
+    @Test
+    @DisplayName("Рисование")
+    fun case_3() {
+        testShape.draw(mockCanvas)
+        val points = mutableListOf<Point>()
+        points.add(Point(12.0, 50.0))
+        points.add(Point(10.0, 7.0))
+        points.add(Point(120.0, 30.0))
+        val expected = listOf(
+            "fillPolygon points=$points fillColor=${Color.GREEN}",
+            "drawPolygon points=$points outlineColor=${Color.RED}"
+        )
+        Assertions.assertEquals(expected, mockCanvas.getDrawingResult())
     }
 }
