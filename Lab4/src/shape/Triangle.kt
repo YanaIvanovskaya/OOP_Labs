@@ -8,12 +8,12 @@ import java.util.*
 import kotlin.math.abs
 import kotlin.math.sqrt
 
-data class Triangle(
-    private val outlineColor: Color,
-    private val fillColor: Color,
-    private val vertex1: Point,
-    private val vertex2: Point,
-    private val vertex3: Point
+class Triangle(
+        private val outlineColor: Color,
+        private val fillColor: Color,
+        private val vertex1: Point,
+        private val vertex2: Point,
+        private val vertex3: Point
 ) : ISolidShape() {
 
     private val mPerimeter = DEFAULT
@@ -28,8 +28,8 @@ data class Triangle(
     override fun getArea(): Double {
         return if (mArea == DEFAULT) {
             0.5 * abs(
-                (vertex2.x - vertex1.x) * (vertex3.y - vertex1.y) -
-                        (vertex3.x - vertex1.x) * (vertex2.y - vertex1.y)
+                    (vertex2.x - vertex1.x) * (vertex3.y - vertex1.y) -
+                            (vertex3.x - vertex1.x) * (vertex2.y - vertex1.y)
             )
         } else mArea
     }

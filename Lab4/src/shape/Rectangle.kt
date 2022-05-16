@@ -6,12 +6,12 @@ import Point
 import java.awt.Color
 import java.util.*
 
-data class Rectangle(
-    private val outlineColor: Color,
-    private val fillColor: Color,
-    private val leftTop: Point,
-    private val width: Double,
-    private val height: Double
+class Rectangle(
+        private val outlineColor: Color,
+        private val fillColor: Color,
+        private val leftTop: Point,
+        private val width: Double,
+        private val height: Double
 ) : ISolidShape() {
 
     private val mPoints = Vector<Point>()

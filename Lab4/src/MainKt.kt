@@ -3,8 +3,8 @@ import java.util.*
 
 fun main() {
     val evaluator = ShapeEvaluator(
-        parser = ShapeXMLParser(),
-        canvas = Canvas()
+            parser = ShapeXMLParser(),
+            canvas = Canvas()
     )
 //    println("Enter the shape description or filepath with description:")
 //    getUserInput { source ->
@@ -12,10 +12,8 @@ fun main() {
 //        evaluator.evaluate(shapesDescription ?: source)
 //    }
     val shapesDescription =
-        tryReadDescriptionFromFile("C:\\Users\\yana-\\All_Projects_Intellij_Idea\\OOP_Labs\\Lab4\\test_src\\picture.xml")
+            tryReadDescriptionFromFile("C:\\Users\\yana-\\All_Projects_Intellij_Idea\\OOP_Labs\\Lab4\\test_src\\picture.xml")
     shapesDescription?.let { evaluator.evaluate(it) }
-
-    //C:\Users\yana-\All_Projects_Intellij_Idea\OOP_Labs\Lab4\test_src\shapes.xml
 }
 
 private fun getUserInput(onEach: (String) -> Unit) {

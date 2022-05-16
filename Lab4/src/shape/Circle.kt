@@ -7,12 +7,11 @@ import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.pow
 
-// обычный класс
-data class Circle(
-    private val outlineColor: Color,
-    private val fillColor: Color,
-    private val center: Point,
-    private val radius: Double
+class Circle(
+        private val outlineColor: Color,
+        private val fillColor: Color,
+        private val center: Point,
+        private val radius: Double
 ) : ISolidShape() {
 
     override fun getFillColor() = fillColor

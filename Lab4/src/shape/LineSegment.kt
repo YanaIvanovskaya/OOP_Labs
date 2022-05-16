@@ -7,10 +7,10 @@ import java.awt.Color
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-data class LineSegment(
-    private val outlineColor: Color,
-    private val start: Point,
-    private val end: Point
+class LineSegment(
+        private val outlineColor: Color,
+        private val start: Point,
+        private val end: Point
 ) : IShape() {
 
     private val mPerimeter = DEFAULT
