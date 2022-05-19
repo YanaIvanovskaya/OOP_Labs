@@ -81,11 +81,8 @@ class ShapeXMLParser : IShapeParser {
         val expectedAttrs = shapeXML.attrs.keys
         for (index in 0 until attrs.length) {
             val attr = attrs.item(index)
-            when {
-                attr.nodeType == Node.COMMENT_NODE ->
-                    continue
-                attr.nodeName !in expectedAttrs ->
-                    throw ParserException("Unexpected attribute for shape ${shapeXML.tag} - ${attr.nodeName}")
+            if (attr.nodeName !in expectedAttrs) {
+                throw ParserException("Unexpected attribute for shape ${shapeXML.tag} - ${attr.nodeName}")
             }
         }
     }
