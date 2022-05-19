@@ -16,5 +16,3 @@ fun smallestCommonMultipleOf(value1: Int, value2: Int): Int {
     val nod = greatestCommonDivisorOf(value1, value2)
     return (value1 * value2) / nod
 }
-
-

@@ -7,11 +7,7 @@ import java.awt.Color
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class LineSegment(
-        private val outlineColor: Color,
-        private val start: Point,
-        private val end: Point
-) : IShape() {
+class LineSegment(private val outlineColor: Color, private val start: Point, private val end: Point) : IShape() {
 
     private val mPerimeter = DEFAULT
 
@@ -35,6 +31,12 @@ class LineSegment(
 
     override fun stringify(): String {
         return "Line (start=(${start.x},${start.y}), end=(${end.x},${end.y}))"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return if (other is LineSegment) {
+            other.start == start && other.end == end && super.equals(other)
+        } else false
     }
 
 }

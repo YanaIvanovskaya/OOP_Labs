@@ -44,4 +44,24 @@ class Rectangle(
     override fun stringify(): String {
         return "Rectangle (leftTop=(${leftTop.x},${leftTop.y}), width=$width, height=$height)"
     }
+
+    override fun equals(other: Any?): Boolean {
+        return if (other is Rectangle) {
+            other.height == height &&
+                    other.width == width &&
+                    other.leftTop == leftTop
+                    && super.equals(other)
+        } else false
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + outlineColor.hashCode()
+        result = 31 * result + fillColor.hashCode()
+        result = 31 * result + leftTop.hashCode()
+        result = 31 * result + width.hashCode()
+        result = 31 * result + height.hashCode()
+        return result
+    }
+
 }

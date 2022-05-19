@@ -1,17 +1,16 @@
 // переопределение == невозможно
 // чем заменить переопределение << >>
 // чем заменить реализацию строки
-
 class Rational {
 
     private var mNumerator: Int
     private var mDenominator: Int
 
     constructor(numerator: Int, denominator: Int) {
-        this.mNumerator = numerator
         require(denominator != 0) {
             "Cannot create rational number with zero denominator"
         }
+        this.mNumerator = numerator
         this.mDenominator = denominator
     }
 

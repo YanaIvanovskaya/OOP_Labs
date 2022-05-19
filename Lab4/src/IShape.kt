@@ -9,6 +9,16 @@ abstract class IShape : ICanvasDrawable {
         return stringify()
     }
 
+    override fun equals(other: Any?): Boolean {
+        return if (other is IShape) {
+            other.getOutlineColor() == getOutlineColor()
+        } else false
+    }
+
+    override fun hashCode(): Int {
+        return javaClass.hashCode()
+    }
+
     companion object {
         const val DEFAULT = -1.0
     }

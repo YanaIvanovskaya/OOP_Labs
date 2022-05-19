@@ -34,4 +34,19 @@ class Circle(
         return "Circle (center=(${center.x},${center.y}), radius=$radius)"
     }
 
+    override fun equals(other: Any?): Boolean {
+        return if (other is Circle) {
+            other.center == center &&
+                    other.radius == radius && super.equals(other)
+        } else false
+    }
+
+    override fun hashCode(): Int {
+        var result = outlineColor.hashCode()
+        result = 31 * result + fillColor.hashCode()
+        result = 31 * result + center.hashCode()
+        result = 31 * result + radius.hashCode()
+        return result
+    }
+
 }

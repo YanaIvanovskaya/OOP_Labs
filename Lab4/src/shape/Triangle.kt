@@ -58,4 +58,22 @@ class Triangle(
                 " vertex3=(${vertex3.x},${vertex3.y}))"
     }
 
+    override fun equals(other: Any?): Boolean {
+        return if (other is Triangle) {
+            other.vertex1 == vertex1
+                    && other.vertex2 == vertex2
+                    && other.vertex3 == vertex3
+                    && super.equals(other)
+        } else false
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + outlineColor.hashCode()
+        result = 31 * result + fillColor.hashCode()
+        result = 31 * result + vertex1.hashCode()
+        result = 31 * result + vertex2.hashCode()
+        result = 31 * result + vertex3.hashCode()
+        return result
+    }
 }

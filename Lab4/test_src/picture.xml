@@ -146,8 +146,32 @@
             center_x="380"
             center_y="420"
             radius="70"
-            fill_color="#782356"
-            outline_color="#E32636"
+            fill_color="#008001"
+            outline_color="#008001"
+    />
+
+    <circle
+            center_x="440"
+            center_y="420"
+            radius="70"
+            fill_color="#008001"
+            outline_color="#008001"
+    />
+
+    <line
+            start_x="410"
+            start_y="480"
+            end_x="410"
+            end_y="500"
+            outline_color="#79553D"
+    />
+
+    <circle
+            center_x="330"
+            center_y="460"
+            radius="30"
+            fill_color="#FFFFFF"
+            outline_color="#FFFFFF"
     />
 
     <rectangle

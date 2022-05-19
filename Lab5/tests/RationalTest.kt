@@ -304,4 +304,14 @@ internal class RationalTest {
         assertEquals(expected, num.toCompoundFraction())
     }
 
+    @Test
+    @DisplayName("При попытке делить на число с числителем, равным нулю, возвращается ошибка")
+    fun case_35() {
+        val num1 = Rational(11, 2)
+        val num2 = Rational(0, 2)
+        assertThrows<java.lang.IllegalArgumentException> {
+            num1 / num2
+        }
+    }
+
 }

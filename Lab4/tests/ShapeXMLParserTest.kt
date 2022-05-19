@@ -70,13 +70,13 @@ internal class ShapeXMLParserTest {
             </shapes>
         """
         val expected = listOf<IShape>(
-            Rectangle(
-                width = 30.0,
-                height = 20.0,
-                leftTop = Point(-150.7, 0.23),
-                outlineColor = Color.decode("#121212"),
-                fillColor = Color.decode("#909090")
-            )
+                Rectangle(
+                        width = 30.0,
+                        height = 20.0,
+                        leftTop = Point(-150.7, 0.23),
+                        outlineColor = Color.decode("#121212"),
+                        fillColor = Color.decode("#909090")
+                )
         )
         Assertions.assertEquals(expected, parser.parse(xml))
     }
@@ -96,12 +96,12 @@ internal class ShapeXMLParserTest {
             </shapes>
         """
         val expected = listOf<IShape>(
-            Circle(
-                radius = 100.0,
-                center = Point(30.0, 12.0),
-                outlineColor = Color.decode("#222222"),
-                fillColor = Color.decode("#665544")
-            )
+                Circle(
+                        radius = 100.0,
+                        center = Point(30.0, 12.0),
+                        outlineColor = Color.decode("#222222"),
+                        fillColor = Color.decode("#665544")
+                )
         )
         Assertions.assertEquals(expected, parser.parse(xml))
     }
@@ -124,13 +124,13 @@ internal class ShapeXMLParserTest {
             </shapes>
         """
         val expected = listOf<IShape>(
-            Triangle(
-                vertex1 = Point(10.0, 12.0),
-                vertex2 = Point(60.0, 2.0),
-                vertex3 = Point(70.0, 92.0),
-                outlineColor = Color.decode("#FFF455"),
-                fillColor = Color.decode("#662222")
-            )
+                Triangle(
+                        vertex1 = Point(10.0, 12.0),
+                        vertex2 = Point(60.0, 2.0),
+                        vertex3 = Point(70.0, 92.0),
+                        outlineColor = Color.decode("#FFF455"),
+                        fillColor = Color.decode("#662222")
+                )
         )
         Assertions.assertEquals(expected, parser.parse(xml))
     }
@@ -150,11 +150,11 @@ internal class ShapeXMLParserTest {
             </shapes>
         """
         val expected = listOf<IShape>(
-            LineSegment(
-                start = Point(70.0, 45.0),
-                end = Point(34.0, 88.0),
-                outlineColor = Color.decode("#000565")
-            )
+                LineSegment(
+                        start = Point(70.0, 45.0),
+                        end = Point(34.0, 88.0),
+                        outlineColor = Color.decode("#000565")
+                )
         )
         Assertions.assertEquals(expected, parser.parse(xml))
     }
@@ -231,12 +231,12 @@ internal class ShapeXMLParserTest {
             </shapes>
         """
         val expected = listOf<IShape>(
-            Circle(
-                radius = 100.0,
-                center = Point(30.0, 12.0),
-                outlineColor = Color.BLACK,
-                fillColor = Color.decode("#665544")
-            )
+                Circle(
+                        radius = 100.0,
+                        center = Point(30.0, 12.0),
+                        outlineColor = Color.BLACK,
+                        fillColor = Color.decode("#665544")
+                )
         )
         Assertions.assertEquals(expected, parser.parse(xml))
     }
@@ -255,12 +255,12 @@ internal class ShapeXMLParserTest {
             </shapes>
         """
         val expected = listOf<IShape>(
-            Circle(
-                radius = 100.0,
-                center = Point(30.0, 12.0),
-                outlineColor = Color.decode("#121212"),
-                fillColor = defaultColor
-            )
+                Circle(
+                        radius = 100.0,
+                        center = Point(30.0, 12.0),
+                        outlineColor = Color.decode("#121212"),
+                        fillColor = defaultColor
+                )
         )
         Assertions.assertEquals(expected, parser.parse(xml))
     }
@@ -278,12 +278,39 @@ internal class ShapeXMLParserTest {
             </shapes>
         """
         val expected = listOf<IShape>(
-            Circle(
-                radius = 100.0,
-                center = Point(30.0, 12.0),
-                outlineColor = Color.BLACK,
-                fillColor = defaultColor
-            )
+                Circle(
+                        radius = 100.0,
+                        center = Point(30.0, 12.0),
+                        outlineColor = Color.BLACK,
+                        fillColor = defaultColor
+                )
+        )
+        Assertions.assertEquals(expected, parser.parse(xml))
+    }
+
+    @Test
+    @DisplayName("В описании  фигур в XML могут быть комментарии")
+    fun case_14() {
+        val xml = """
+            <shapes>
+             <!--comment-->
+                 <circle
+                    radius='100'
+                    center_x='30'
+                    center_y='12'
+                />
+            </shapes>
+        """
+        Assertions.assertDoesNotThrow {
+            parser.parse(xml)
+        }
+        val expected = listOf<IShape>(
+                Circle(
+                        radius = 100.0,
+                        center = Point(30.0, 12.0),
+                        outlineColor = Color.BLACK,
+                        fillColor = defaultColor
+                )
         )
         Assertions.assertEquals(expected, parser.parse(xml))
     }

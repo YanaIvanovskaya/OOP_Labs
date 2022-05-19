@@ -30,7 +30,7 @@ class ShapeXMLParser : IShapeParser {
         val childNodes = rootNode.childNodes
         for (index in 0 until childNodes.length) {
             val child = childNodes.item(index)
-            if (child.nodeType != Node.TEXT_NODE) {
+            if (child.nodeType !in listOf(Node.TEXT_NODE, Node.COMMENT_NODE)) {
                 shapes.add(createShapeFromNode(child))
             }
         }
@@ -71,8 +71,8 @@ class ShapeXMLParser : IShapeParser {
     private fun ensureRequiredAttributes(attrs: NamedNodeMap, shapeXML: ShapeXML) {
         if (attrs.length < shapeXML.countOfRequired) {
             val msg =
-                "Tag <${shapeXML.tag}> expected ${shapeXML.countOfRequired} required attributes: " +
-                        "${shapeXML.attrs.filter { it.value }.keys}"
+                    "Tag <${shapeXML.tag}> expected ${shapeXML.countOfRequired} required attributes: " +
+                            "${shapeXML.attrs.filter { it.value }.keys}"
             throw ParserException(msg)
         }
     }
@@ -81,8 +81,11 @@ class ShapeXMLParser : IShapeParser {
         val expectedAttrs = shapeXML.attrs.keys
         for (index in 0 until attrs.length) {
             val attr = attrs.item(index)
-            if (attr.nodeName !in expectedAttrs) {
-                throw ParserException("Unexpected attribute for shape ${shapeXML.tag} - ${attr.nodeName}")
+            when {
+                attr.nodeType == Node.COMMENT_NODE ->
+                    continue
+                attr.nodeName !in expectedAttrs ->
+                    throw ParserException("Unexpected attribute for shape ${shapeXML.tag} - ${attr.nodeName}")
             }
         }
     }
@@ -91,7 +94,7 @@ class ShapeXMLParser : IShapeParser {
         var hexColor = ""
         return runCatching {
             hexColor = attrs.getAttributeByName(ShapeXML.OUTLINE_COLOR)
-                ?: return@runCatching DEFAULT_OUTLINE_COLOR
+                    ?: return@runCatching DEFAULT_OUTLINE_COLOR
             Color.decode(hexColor)
         }.getOrElse { throw ParserException("Incorrect outline color - $hexColor") }
     }
@@ -100,62 +103,62 @@ class ShapeXMLParser : IShapeParser {
         var hexColor = ""
         return runCatching {
             hexColor = attrs.getAttributeByName(ShapeXML.FILL_COLOR)
-                ?: return@runCatching DEFAULT_FILL_COLOR
+                    ?: return@runCatching DEFAULT_FILL_COLOR
             Color.decode(hexColor)
         }.getOrElse { throw ParserException("Incorrect fill color - $hexColor") }
     }
 
     private fun createTriangle(
-        attrs: NamedNodeMap,
-        outlineColor: Color,
-        fillColor: Color
+            attrs: NamedNodeMap,
+            outlineColor: Color,
+            fillColor: Color
     ) = Triangle(
-        outlineColor = outlineColor,
-        fillColor = fillColor,
-        vertex1 = createPoint(attrs, ShapeXML.Triangle.vertex1X, ShapeXML.Triangle.vertex1Y),
-        vertex2 = createPoint(attrs, ShapeXML.Triangle.vertex2X, ShapeXML.Triangle.vertex2Y),
-        vertex3 = createPoint(attrs, ShapeXML.Triangle.vertex3X, ShapeXML.Triangle.vertex3Y)
+            outlineColor = outlineColor,
+            fillColor = fillColor,
+            vertex1 = createPoint(attrs, ShapeXML.Triangle.vertex1X, ShapeXML.Triangle.vertex1Y),
+            vertex2 = createPoint(attrs, ShapeXML.Triangle.vertex2X, ShapeXML.Triangle.vertex2Y),
+            vertex3 = createPoint(attrs, ShapeXML.Triangle.vertex3X, ShapeXML.Triangle.vertex3Y)
     )
 
     private fun createLine(
-        attrs: NamedNodeMap,
-        outlineColor: Color
+            attrs: NamedNodeMap,
+            outlineColor: Color
     ) = LineSegment(
-        start = createPoint(attrs, ShapeXML.Line.startX, ShapeXML.Line.startY),
-        end = createPoint(attrs, ShapeXML.Line.endX, ShapeXML.Line.endY),
-        outlineColor = outlineColor
+            start = createPoint(attrs, ShapeXML.Line.startX, ShapeXML.Line.startY),
+            end = createPoint(attrs, ShapeXML.Line.endX, ShapeXML.Line.endY),
+            outlineColor = outlineColor
     )
 
     private fun createRectangle(
-        attrs: NamedNodeMap,
-        outlineColor: Color,
-        fillColor: Color
+            attrs: NamedNodeMap,
+            outlineColor: Color,
+            fillColor: Color
     ) = Rectangle(
-        outlineColor = outlineColor,
-        fillColor = fillColor,
-        leftTop = createPoint(attrs, ShapeXML.Rectangle.leftTopX, ShapeXML.Rectangle.leftTopY),
-        width = attrs.getDoubleAttributeByName(ShapeXML.Rectangle.width),
-        height = attrs.getDoubleAttributeByName(ShapeXML.Rectangle.height)
+            outlineColor = outlineColor,
+            fillColor = fillColor,
+            leftTop = createPoint(attrs, ShapeXML.Rectangle.leftTopX, ShapeXML.Rectangle.leftTopY),
+            width = attrs.getDoubleAttributeByName(ShapeXML.Rectangle.width),
+            height = attrs.getDoubleAttributeByName(ShapeXML.Rectangle.height)
     )
 
     private fun createCircle(
-        attrs: NamedNodeMap,
-        outlineColor: Color,
-        fillColor: Color
+            attrs: NamedNodeMap,
+            outlineColor: Color,
+            fillColor: Color
     ) = Circle(
-        center = createPoint(attrs, ShapeXML.Circle.centerX, ShapeXML.Circle.centerY),
-        outlineColor = outlineColor,
-        fillColor = fillColor,
-        radius = attrs.getDoubleAttributeByName(ShapeXML.Circle.radius)
+            center = createPoint(attrs, ShapeXML.Circle.centerX, ShapeXML.Circle.centerY),
+            outlineColor = outlineColor,
+            fillColor = fillColor,
+            radius = attrs.getDoubleAttributeByName(ShapeXML.Circle.radius)
     )
 
     private fun createPoint(
-        attrs: NamedNodeMap,
-        nameX: String,
-        nameY: String
+            attrs: NamedNodeMap,
+            nameX: String,
+            nameY: String
     ) = Point(
-        x = attrs.getDoubleAttributeByName(nameX),
-        y = attrs.getDoubleAttributeByName(nameY)
+            x = attrs.getDoubleAttributeByName(nameX),
+            y = attrs.getDoubleAttributeByName(nameY)
     )
 
     private fun NamedNodeMap.getAttributeByName(name: String): String? {
