@@ -3,9 +3,11 @@ package shape
 import ICanvas
 import ISolidShape
 import Point
+import distanceTo
 import java.awt.Color
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.pow
 import kotlin.math.sqrt
 
 class Triangle(
@@ -14,10 +16,10 @@ class Triangle(
         private val vertex1: Point,
         private val vertex2: Point,
         private val vertex3: Point
-) : ISolidShape() {
+) : ISolidShape {
 
-    private val mPerimeter = DEFAULT
-    private val mArea = DEFAULT
+    private var mPerimeter: Double? = null
+    private var mArea: Double? = null
     private val mPoints = Vector<Point>().apply {
         addAll(listOf(vertex1, vertex2, vertex3))
     }
@@ -26,25 +28,20 @@ class Triangle(
     override fun getOutlineColor() = outlineColor
 
     override fun getArea(): Double {
-        return if (mArea == DEFAULT) {
-            0.5 * abs(
-                    (vertex2.x - vertex1.x) * (vertex3.y - vertex1.y) -
-                            (vertex3.x - vertex1.x) * (vertex2.y - vertex1.y)
-            )
-        } else mArea
+        return if (mArea == null) {
+            0.5 * abs((vertex2.x - vertex1.x) * (vertex3.y - vertex1.y) -
+                    (vertex3.x - vertex1.x) * (vertex2.y - vertex1.y)
+            ).also { mArea = it }
+        } else mArea ?: 0.0
     }
 
     override fun getPerimeter(): Double {
-        return if (mPerimeter == DEFAULT) {
-            val vector12 = Point(vertex2.x - vertex1.x, vertex2.y - vertex1.y)
-            val vector23 = Point(vertex3.x - vertex2.x, vertex3.y - vertex2.y)
-            val vector31 = Point(vertex1.x - vertex3.x, vertex1.y - vertex3.y)
-
-            val len12 = sqrt(vector12.x * vector12.x + vector12.y * vector12.y)
-            val len23 = sqrt(vector23.x * vector23.x + vector23.y * vector23.y)
-            val len31 = sqrt(vector31.x * vector31.x + vector31.y * vector31.y)
-            len12 + len23 + len31
-        } else mPerimeter
+        return if (mPerimeter == null) {
+            val len12 = vertex1.distanceTo(vertex2)
+            val len23 = vertex2.distanceTo(vertex3)
+            val len31 = vertex3.distanceTo(vertex1)
+            (len12 + len23 + len31).also { mPerimeter = it }
+        } else mPerimeter ?: 0.0
     }
 
     override fun draw(canvas: ICanvas) {
@@ -58,12 +55,17 @@ class Triangle(
                 " vertex3=(${vertex3.x},${vertex3.y}))"
     }
 
+    override fun toString(): String {
+        return stringify()
+    }
+
     override fun equals(other: Any?): Boolean {
         return if (other is Triangle) {
             other.vertex1 == vertex1
                     && other.vertex2 == vertex2
                     && other.vertex3 == vertex3
-                    && super.equals(other)
+                    && other.outlineColor == outlineColor
+                    && other.fillColor == fillColor
         } else false
     }
 

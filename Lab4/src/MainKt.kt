@@ -6,13 +6,12 @@ fun main() {
             parser = ShapeXMLParser(),
             canvas = Canvas()
     )
-//    println("Enter the shape description or filepath with description:")
-//    getUserInput { source ->
-//        val shapesDescription = tryReadDescriptionFromFile(source)
-//        evaluator.evaluate(shapesDescription ?: source)
-//    }
-    val shapesDescription =
-            tryReadDescriptionFromFile("C:\\Users\\yana-\\All_Projects_Intellij_Idea\\OOP_Labs\\Lab4\\test_src\\picture.xml")
+/*    println("Enter the shape description or filepath with description:")
+    getUserInput { source ->
+        val shapesDescription = tryReadDescriptionFromFile(source)
+        evaluator.evaluate(shapesDescription ?: source)
+    }*/
+    val shapesDescription = tryReadDescriptionFromFile("Lab4/test_src/picture.xml")
     shapesDescription?.let { evaluator.evaluate(it) }
 }
 

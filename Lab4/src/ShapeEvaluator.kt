@@ -25,7 +25,6 @@ class ShapeEvaluator(
 
 }
 
-// как лучше размещать статические функции: сделать их свободными но приватными внутри файла или использовать  companion object
 fun findShapeWithSmallestPerimeter(shapes: List<IShape>): IShape? {
     return shapes.minByOrNull(IShape::getPerimeter)
 }

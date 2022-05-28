@@ -9,7 +9,7 @@ import shape.Triangle
 import java.awt.Color
 import java.io.StringReader
 import javax.xml.parsers.DocumentBuilderFactory
-
+// расположить файлы с учетом ацикличности зависимостей
 class ParserException(val description: String) : Throwable()
 
 class ShapeXMLParser : IShapeParser {

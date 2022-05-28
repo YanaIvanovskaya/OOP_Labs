@@ -12,7 +12,7 @@ class Rectangle(
         private val leftTop: Point,
         private val width: Double,
         private val height: Double
-) : ISolidShape() {
+) : ISolidShape {
 
     private val mPoints = Vector<Point>()
 
@@ -45,12 +45,17 @@ class Rectangle(
         return "Rectangle (leftTop=(${leftTop.x},${leftTop.y}), width=$width, height=$height)"
     }
 
+    override fun toString(): String {
+        return stringify()
+    }
+
     override fun equals(other: Any?): Boolean {
         return if (other is Rectangle) {
             other.height == height &&
                     other.width == width &&
-                    other.leftTop == leftTop
-                    && super.equals(other)
+                    other.leftTop == leftTop &&
+                    other.outlineColor == outlineColor &&
+                    other.fillColor == fillColor
         } else false
     }
 

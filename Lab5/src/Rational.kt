@@ -1,6 +1,8 @@
-// переопределение == невозможно
-// чем заменить переопределение << >>
-// чем заменить реализацию строки
+import java.io.InputStream
+import java.io.OutputStream
+import java.util.Scanner
+import kotlin.math.sign
+
 class Rational {
 
     private var mNumerator: Int
@@ -10,8 +12,13 @@ class Rational {
         require(denominator != 0) {
             "Cannot create rational number with zero denominator"
         }
-        this.mNumerator = numerator
-        this.mDenominator = denominator
+        mNumerator = numerator
+        mDenominator = denominator
+        if (denominator.sign == -1) {
+            mNumerator *= -1
+            mDenominator *= -1
+        }
+        normalize()
     }
 
     constructor() : this(numerator = 0, denominator = 1)
@@ -38,22 +45,24 @@ class Rational {
         return firstPart to secondPart
     }
 
+    fun writeTo(outputStream: OutputStream) {
+        outputStream.write(this.toString().toByteArray())
+    }
+
     operator fun unaryMinus(): Rational {
-        mNumerator *= -1
-        return this.normalize()
+        return Rational(mNumerator * -1, mDenominator)
     }
 
     operator fun unaryPlus(): Rational {
-        return this.normalize()
+        return Rational(mNumerator, mDenominator)
     }
 
     operator fun plus(other: Rational): Rational {
-        val operands = toCommonDenominator(other)
-        val result = Rational(
+        val operands = toCommonDenominator(this, other)
+        return Rational(
                 numerator = operands.first.mNumerator + operands.second.mNumerator,
                 denominator = operands.first.mDenominator
         )
-        return result.normalize()
     }
 
     operator fun plus(other: Int): Rational {
@@ -61,12 +70,11 @@ class Rational {
     }
 
     operator fun minus(other: Rational): Rational {
-        val operands = toCommonDenominator(other)
-        val result = Rational(
+        val operands = toCommonDenominator(this, other)
+        return Rational(
                 numerator = operands.first.mNumerator - operands.second.mNumerator,
                 denominator = operands.first.mDenominator
         )
-        return result.normalize()
     }
 
     operator fun minus(other: Int): Rational {
@@ -77,7 +85,7 @@ class Rational {
         return Rational(
                 numerator = mNumerator * other.mNumerator,
                 denominator = mDenominator * other.mDenominator
-        ).normalize()
+        )
     }
 
     operator fun times(other: Int): Rational {
@@ -88,7 +96,7 @@ class Rational {
         return Rational(
                 numerator = mNumerator * other.mDenominator,
                 denominator = mDenominator * other.mNumerator
-        ).normalize()
+        )
     }
 
     operator fun div(other: Int): Rational {
@@ -149,7 +157,6 @@ class Rational {
         return compareTo(Rational(other))
     }
 
-    // dont work for int
     override operator fun equals(other: Any?): Boolean {
         return when (other) {
             is Rational -> mNumerator == other.mNumerator && mDenominator == other.mDenominator
@@ -168,37 +175,43 @@ class Rational {
         return result
     }
 
-    private fun toCommonDenominator(other: Rational): Pair<Rational, Rational> {
-        var thisCopy = this
-        var otherCopy = other
-        when {
-            (mDenominator % other.mDenominator) == 0 -> {
-                otherCopy = otherCopy.multiplyTo(mDenominator / other.mDenominator)
+    private fun normalize(): Rational {
+        val gcd = greatestCommonDivisorOf(mNumerator, mDenominator)
+        mNumerator /= gcd
+        mDenominator /= gcd
+        return this
+    }
+
+    companion object {
+
+        private fun toCommonDenominator(first: Rational, second: Rational): Pair<Rational, Rational> {
+            val denominator = smallestCommonMultipleOf(first.mDenominator, second.mDenominator)
+            val processedFirst = Rational(1, denominator).apply {
+                mNumerator = first.mNumerator * (denominator / first.mDenominator)
             }
-            (other.mDenominator % mDenominator) == 0 -> {
-                thisCopy = thisCopy.multiplyTo(other.mDenominator / mDenominator)
+            val processedSecond = Rational(1, denominator).apply {
+                mNumerator = second.mNumerator * (denominator / second.mDenominator)
             }
-            else -> {
-                val denominator = smallestCommonMultipleOf(this.mDenominator, other.mDenominator)
-                thisCopy = thisCopy.multiplyTo(denominator / mDenominator)
-                otherCopy = otherCopy.multiplyTo(denominator / other.mDenominator)
+            return processedFirst to processedSecond
+        }
+
+        fun readFrom(inputStream: InputStream): Rational? {
+            val strRepresentation: String
+            Scanner(inputStream).use {
+                strRepresentation = if (it.hasNextLine()) it.next() else ""
+            }
+            return when {
+                strRepresentation.matches(Regex("""(-?)\d+/\d+""")) -> {
+                    val numerator = strRepresentation.substringBefore("/").toInt()
+                    val denominator = strRepresentation.substringAfter("/").toInt()
+                    Rational(numerator, denominator)
+                }
+                strRepresentation.matches(Regex("""(-?)\d+""")) ->
+                    Rational(strRepresentation.toInt())
+                else -> null
             }
         }
-        return thisCopy to otherCopy
-    }
 
-    private fun multiplyTo(multiplier: Int): Rational {
-        return Rational(
-                numerator = mNumerator * multiplier,
-                denominator = mDenominator * multiplier
-        )
-    }
-
-    private fun normalize(): Rational {
-        val nod = greatestCommonDivisorOf(mNumerator, mDenominator)
-        mNumerator /= nod
-        mDenominator /= nod
-        return this
     }
 
 }

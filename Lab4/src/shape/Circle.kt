@@ -12,7 +12,7 @@ class Circle(
         private val fillColor: Color,
         private val center: Point,
         private val radius: Double
-) : ISolidShape() {
+) : ISolidShape {
 
     override fun getFillColor() = fillColor
     override fun getOutlineColor() = outlineColor
@@ -34,10 +34,16 @@ class Circle(
         return "Circle (center=(${center.x},${center.y}), radius=$radius)"
     }
 
+    override fun toString(): String {
+        return stringify()
+    }
+
     override fun equals(other: Any?): Boolean {
         return if (other is Circle) {
             other.center == center &&
-                    other.radius == radius && super.equals(other)
+                    other.radius == radius &&
+                    other.outlineColor == outlineColor &&
+                    other.fillColor == fillColor
         } else false
     }
 

@@ -1,8 +1,9 @@
-﻿import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+﻿import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.io.File
+import java.util.*
 
 internal class RationalTest {
 
@@ -29,11 +30,11 @@ internal class RationalTest {
     }
 
     @Test
-    @DisplayName("Конструктор с 2 параметрами создает рациональное число параметр1/параметр2")
+    @DisplayName("Конструктор с 2 параметрами создает нормализованное рациональное число параметр1/параметр2")
     fun case_3() {
         val num = Rational(10, 25)
-        assertEquals(10, num.getNumerator())
-        assertEquals(25, num.getDenominator())
+        assertEquals(2, num.getNumerator())
+        assertEquals(5, num.getDenominator())
     }
 
     @Test
@@ -204,12 +205,6 @@ internal class RationalTest {
     }
 
     @Test
-    @DisplayName("== : rational == int")
-    fun case_21() {
-        // dont work
-    }
-
-    @Test
     @DisplayName("== : rational == rational")
     fun case_22() {
         val num1 = Rational(4, 1)
@@ -299,8 +294,8 @@ internal class RationalTest {
     @Test
     @DisplayName("Функция toCompoundFraction должна возвращать смешанную дробь")
     fun case_34() {
-        val num = Rational(11, 2)
-        val expected = 5 to Rational(1, 2)
+        val num = Rational(-9, 4)
+        val expected = -2 to Rational(-1, 4)
         assertEquals(expected, num.toCompoundFraction())
     }
 
@@ -312,6 +307,80 @@ internal class RationalTest {
         assertThrows<java.lang.IllegalArgumentException> {
             num1 / num2
         }
+    }
+
+    @Test
+    @DisplayName("Функция writeTo записывает рациональное число в выходной поток")
+    fun case_37() {
+        val num = Rational(-12, 34)
+        val outputStream = File("tests/test_data/output.txt").outputStream()
+        num.writeTo(outputStream)
+        val expected = Scanner(File("tests/test_data/output_result.txt").inputStream()).nextLine()
+        assertEquals(expected, num.toString())
+    }
+
+    @Test
+    @DisplayName("Считывание рационального число в виде Int/Int из входного потока")
+    fun case_38() {
+        val inputStream = "-6/17".toByteArray().inputStream()
+        val expected = Rational(-6, 17)
+        assertEquals(expected, Rational.readFrom(inputStream))
+    }
+
+    @Test
+    @DisplayName("Считывание рационального числа в виде Int из входного потока")
+    fun case_44() {
+        val inputStream = "-6".toByteArray().inputStream()
+        val expected = Rational(-6, 1)
+        assertEquals(expected, Rational.readFrom(inputStream))
+    }
+
+    @Test
+    @DisplayName("int + rational = rational")
+    fun case_39() {
+        val num = Rational(-1, 2)
+        val expected = Rational(3, 2)
+        assertEquals(expected, 2 + num)
+    }
+
+    @Test
+    @DisplayName("int - rational = rational")
+    fun case_40() {
+        val num = Rational(-1, 2)
+        val expected = Rational(5, 2)
+        assertEquals(expected, 2 - num)
+    }
+
+    @Test
+    @DisplayName("int * rational = rational")
+    fun case_41() {
+        val num = Rational(-1, 2)
+        val expected = Rational(-1, 1)
+        assertEquals(expected, 2 * num)
+    }
+
+    @Test
+    @DisplayName("int / rational = rational")
+    fun case_42() {
+        val num = Rational(-1, 2)
+        val expected = Rational(-4, 1)
+        assertEquals(expected, 2 / num)
+    }
+
+    @Test
+    @DisplayName("int ><>=<= rational")
+    fun case_43() {
+        assertTrue { 2 > Rational(1, 2) }
+        assertFalse { 0 > Rational(1, 2) }
+
+        assertTrue { -1 < Rational(1, 2) }
+        assertFalse { 1 < Rational(1, 2) }
+
+        assertTrue { 0 <= Rational() }
+        assertFalse { 1 <= Rational() }
+
+        assertTrue { 1 >= Rational(1) }
+        assertFalse { 0 >= Rational(2, 3) }
     }
 
 }
