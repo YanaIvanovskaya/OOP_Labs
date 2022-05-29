@@ -1,11 +1,11 @@
 import java.net.MalformedURLException
 
 object UrlMatcher {
-    private val protocolRegex = """((${getProtocolRegex()})://)"""
-    private val hostRegex = """([\w.-]+)""".toRegex()
-    private val portRegex = """(:(\d+))?""".toRegex()
-    private val documentRegex = """((/[\w.]+)+)?""".toRegex()
-    private val urlRegex = (protocolRegex + hostRegex + portRegex + documentRegex).toRegex()
+    private val protocol = getProtocolRegexStr()
+    private const val host = """([\w.-]+)"""
+    private const val port = """(:(\d+))?"""
+    private const val document = """((/[\w.]+)+)?"""
+    private val urlRegex = (protocol + host + port + document).toRegex()
 
     @Throws(MalformedURLException::class)
     fun getUrlInfo(url: String): UrlInfo {
@@ -19,24 +19,22 @@ object UrlMatcher {
         }
     }
 
-    private fun getProtocolRegex(): String {
-        var regex = ""
+    private fun getProtocolRegexStr(): String {
+        var regexStr = ""
         Protocol.values()
                 .sortedByDescending { it.value.length }
                 .forEach { protocol ->
                     val isLastElement = protocol == Protocol.UNKNOWN
-                    regex += "${protocol.value}|${protocol.value.uppercase()}${if (isLastElement) "" else "|"}"
+                    regexStr += "${protocol.value}|${protocol.value.uppercase()}${if (isLastElement) "" else "|"}"
                 }
-        return regex
+        regexStr = "(?i)(($regexStr)://)"
+        return regexStr
     }
 
 }
 
 private fun MatchResult?.toUrlInfo(): UrlInfo? {
     this ?: return null
-    println(groupValues)
-//    val isPortInvalid = groupValues[4] == ":"
-//    if (isPortInvalid) return null
     val protocol = Protocol.fromString(groupValues[2])
     return UrlInfo(
             protocol = protocol,

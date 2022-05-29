@@ -64,8 +64,9 @@ internal class UrlMatcherTest {
     @Test
     @DisplayName("Название протокола может быть в любом регистре")
     fun case_6() {
-        val url = "HTTPS://qwerty.ru/document/12/23"
-        //
+        val url = "HTtPs://qwerty.ru/document/12/23"
+        val expected = UrlInfo(protocol = Protocol.HTTPS, host = "qwerty.ru", port = 443, document = "/document/12/23")
+        assertEquals(expected, UrlMatcher.getUrlInfo(url))
     }
 
     @Test
