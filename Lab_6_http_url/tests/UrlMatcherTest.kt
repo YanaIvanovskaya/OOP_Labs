@@ -1,3 +1,6 @@
+import lab_2_task_5.Protocol
+import lab_2_task_5.UrlInfo
+import lab_2_task_5.UrlMatcher
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -65,7 +68,7 @@ internal class UrlMatcherTest {
     @DisplayName("Название протокола может быть в любом регистре")
     fun case_6() {
         val url = "HTtPs://qwerty.ru/document/12/23"
-        val expected = UrlInfo(protocol = Protocol.HTTPS, host = "qwerty.ru", port = 443, document = "/document/12/23")
+        val expected = UrlInfo(protocol = Protocol.HTTPS, host = "qwerty.ru", port = 80, document = "/document/12/23")
         assertEquals(expected, UrlMatcher.getUrlInfo(url))
     }
 

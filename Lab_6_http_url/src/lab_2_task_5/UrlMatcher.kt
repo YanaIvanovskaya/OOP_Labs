@@ -1,3 +1,5 @@
+package lab_2_task_5
+
 import java.net.MalformedURLException
 
 object UrlMatcher {
@@ -19,12 +21,24 @@ object UrlMatcher {
         }
     }
 
+    fun validate(domain: String, document: String, port: Int) {
+        if (!host.toRegex().matches(domain)) {
+            throw java.lang.IllegalArgumentException("Domain is incorrect")
+        }
+        if (port !in 1..65535) {
+            throw java.lang.IllegalArgumentException("Port number must be in range [1;65535]")
+        }
+        if (!this.document.toRegex().matches(document)) {
+            throw java.lang.IllegalArgumentException("Document is incorrect")
+        }
+    }
+
     private fun getProtocolRegexStr(): String {
         var regexStr = ""
         Protocol.values()
                 .sortedByDescending { it.value.length }
-                .forEach { protocol ->
-                    val isLastElement = protocol == Protocol.UNKNOWN
+                .forEachIndexed { index, protocol ->
+                    val isLastElement = index == Protocol.values().lastIndex
                     regexStr += "${protocol.value}|${protocol.value.uppercase()}${if (isLastElement) "" else "|"}"
                 }
         regexStr = "(?i)(($regexStr)://)"
@@ -35,7 +49,7 @@ object UrlMatcher {
 
 private fun MatchResult?.toUrlInfo(): UrlInfo? {
     this ?: return null
-    val protocol = Protocol.fromString(groupValues[2])
+    val protocol = Protocol.fromString(groupValues[2]) ?: return null
     return UrlInfo(
             protocol = protocol,
             host = groupValues[3],
