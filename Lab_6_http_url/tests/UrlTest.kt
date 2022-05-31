@@ -113,28 +113,5 @@ internal class UrlTest {
         val expected = "https://qwerty-123.ru/doc/123"
         assertEquals(url.url, expected)
     }
-//
-//    @Test
-//    @DisplayName("Свойство domain возвращает домен урла в виде строки")
-//    fun case_5() {
-//
-//    }
-//
-//    @Test
-//    @DisplayName("Свойство document возвращает имя документа урла в виде строки")
-//    fun case_6() {
-//
-//    }
-//
-//    @Test
-//    @DisplayName("Свойство port возвращает номер порта урла в виде целого числа")
-//    fun case_7() {
-//
-//    }
-//
-//    @Test
-//    @DisplayName("Свойство protocol возвращает протокол урла в виде объекта enum")
-//    fun case_8() {
-//
-//    }
+
 }

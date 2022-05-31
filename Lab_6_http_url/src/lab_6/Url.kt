@@ -13,6 +13,7 @@ class Url {
 
     constructor(url: String) {
         val urlInfo = parseUrl(url)
+
         mDocument = urlInfo.document
         mDomain = urlInfo.host
         mPort = urlInfo.port
@@ -41,7 +42,7 @@ class Url {
         mProtocol = protocol
     }
 
-    private fun String.setSlashInFront() = if (startsWith("/")) this else "/$this"
+    private fun String.setSlashInFront() = if (startsWith("/") || isBlank()) this else "/$this"
 
     val url: String
         get() {

@@ -1,5 +1,5 @@
-import lab_2_task_5.UrlInfo
-import lab_2_task_5.UrlMatcher
+package lab_2_task_5
+
 import java.net.MalformedURLException
 import java.util.*
 
