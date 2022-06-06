@@ -25,10 +25,6 @@ fun interface Comparator<T> {
     fun compare(first: T, second: T): Boolean
 }
 
-//fun someFun(first: Sportsman, second: Sportsman): Boolean {
-//    return false
-//}
-
 fun main() {
     val test = listOf(
             Sportsman("Jack", 90, 280),

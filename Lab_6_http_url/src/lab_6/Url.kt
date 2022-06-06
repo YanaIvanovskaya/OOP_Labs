@@ -1,70 +1,68 @@
 package lab_6
 
 import lab_2_task_5.Protocol
-import lab_2_task_5.UrlInfo
 import lab_2_task_5.UrlMatcher
 
 class Url {
 
-    private val mDocument: String
-    private val mDomain: String
-    private val mProtocol: Protocol
-    private val mPort: Int
+    val document: String
+    val domain: String
+    val protocol: Protocol
+    val port: Int
 
-    constructor(url: String) {
-        val urlInfo = parseUrl(url)
+    val url: String
+        get() {
+            val port = if (port != protocol.port) ":$port" else ""
+            return "${protocol.value}://$domain$port$document"
+        }
 
-        mDocument = urlInfo.document
-        mDomain = urlInfo.host
-        mPort = urlInfo.port
-        mProtocol = urlInfo.protocol
-    }
+    constructor(domain: String, document: String, protocol: Protocol) {
+        val documentWithSlash = document.setSlashInFront()
 
-    constructor(domain: String, document: String) {
-        val documentWithFlash = document.setSlashInFront()
+        UrlMatcher.validate(domain = domain, document = documentWithSlash, port = protocol.port)
 
-        UrlMatcher.validate(domain = domain, document = documentWithFlash, port = 80)
-
-        mDocument = documentWithFlash
-        mDomain = domain
-        mPort = 80
-        mProtocol = Protocol.HTTP
+        this.document = documentWithSlash
+        this.domain = domain
+        this.port = protocol.port
+        this.protocol = protocol
     }
 
     constructor(domain: String, document: String, protocol: Protocol, port: Int) {
-        val documentWithFlash = document.setSlashInFront()
+        val documentWithSlash = document.setSlashInFront()
 
-        UrlMatcher.validate(domain = domain, document = documentWithFlash, port = port)
+        UrlMatcher.validate(domain = domain, document = documentWithSlash, port = port)
 
-        mDocument = documentWithFlash
-        mDomain = domain
-        mPort = port
-        mProtocol = protocol
+        this.document = documentWithSlash
+        this.domain = domain
+        this.port = port
+        this.protocol = protocol
+    }
+
+    override fun toString(): String {
+        return "URL(domain=$domain, protocol=$protocol, port=$port, document=$document)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return if (other is Url) {
+            this.document == other.document
+                    && this.domain == other.domain
+                    && this.protocol == other.protocol
+                    && this.port == other.port
+        } else false
+    }
+
+    override fun hashCode(): Int {
+        var result = document.hashCode()
+        result = 31 * result + domain.hashCode()
+        result = 31 * result + protocol.hashCode()
+        result = 31 * result + port
+        return result
     }
 
     private fun String.setSlashInFront() = if (startsWith("/") || isBlank()) this else "/$this"
 
-    val url: String
-        get() {
-            val protocol = "${mProtocol.value}://"
-            val port = if (mPort != mProtocol.port) ":$mPort" else ""
-            return "$protocol$mDomain$port$mDocument"
-        }
-
-    val document: String
-        get() = mDocument
-
-    val domain: String
-        get() = mDomain
-
-    val port: Int
-        get() = mPort
-
-    val protocol: Protocol
-        get() = mProtocol
-
-    private fun parseUrl(url: String): UrlInfo {
-        return UrlMatcher.getUrlInfo(url)
+    companion object {
+        fun parse(url: String): Url = UrlMatcher.getUrl(url)
     }
 
 }

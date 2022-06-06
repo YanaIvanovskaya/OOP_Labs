@@ -1,36 +1,51 @@
 package lab_2_task_5
 
+import lab_6.Url
 import java.net.MalformedURLException
 
 object UrlMatcher {
     private val protocol = getProtocolRegexStr()
     private const val host = """([\w.-]+)"""
     private const val port = """(:(\d+))?"""
-    private const val document = """((/[\w.]+)+)?"""
+    private const val document = """(/|(/[^/]+?)+)?"""
     private val urlRegex = (protocol + host + port + document).toRegex()
 
     @Throws(MalformedURLException::class)
-    fun getUrlInfo(url: String): UrlInfo {
-        val urlInfo = urlRegex.matchEntire(url)?.toUrlInfo()
+    fun getUrl(url: String): Url {
+        val matchResult = urlRegex.matchEntire(url)?.groupValues
+        val protocol = matchResult?.let {
+            Protocol.fromString(matchResult[2])
+        } ?: throw MalformedURLException("Error: This is not url")
+
+        val port = matchResult[5]
+                .runCatching { toInt() }
+                .getOrDefault(protocol.port)
+
         when {
-            urlInfo == null ->
-                throw MalformedURLException("Error: This is not url")
-            urlInfo.port !in 1..65535 ->
+            !isPortValid(port) ->
                 throw MalformedURLException("Error: Port number must be in range [1;65535]")
-            else -> return urlInfo
+            else -> return Url(
+                    protocol = protocol,
+                    domain = matchResult[3],
+                    port = port,
+                    document = matchResult[6]
+            )
         }
     }
 
     fun validate(domain: String, document: String, port: Int) {
-        if (!host.toRegex().matches(domain)) {
-            throw java.lang.IllegalArgumentException("Domain is incorrect")
+        when {
+            !host.toRegex().matches(domain) ->
+                throw java.lang.IllegalArgumentException("Domain is incorrect")
+            !isPortValid(port) ->
+                throw java.lang.IllegalArgumentException("Port number must be in range [1;65535]")
+            !this.document.toRegex().matches(document) ->
+                throw java.lang.IllegalArgumentException("Document is incorrect")
         }
-        if (port !in 1..65535) {
-            throw java.lang.IllegalArgumentException("Port number must be in range [1;65535]")
-        }
-        if (!this.document.toRegex().matches(document)) {
-            throw java.lang.IllegalArgumentException("Document is incorrect")
-        }
+    }
+
+    private fun isPortValid(port: Int): Boolean {
+        return port in 1..65535
     }
 
     private fun getProtocolRegexStr(): String {
@@ -45,15 +60,4 @@ object UrlMatcher {
         return regexStr
     }
 
-}
-
-private fun MatchResult?.toUrlInfo(): UrlInfo? {
-    this ?: return null
-    val protocol = Protocol.fromString(groupValues[2]) ?: return null
-    return UrlInfo(
-            protocol = protocol,
-            host = groupValues[3],
-            port = groupValues[5].runCatching { toInt() }.getOrDefault(protocol.port),
-            document = groupValues[6]
-    )
 }

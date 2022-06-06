@@ -2,6 +2,9 @@ package task_2
 
 class MyStack<T> {
 
+    // реализовать через односвязный список
+    // сделать метод copyFrom
+    // cloneable copyable
     private var mList = mutableListOf<T>()
 
     // Вталкивание элемента на вершину стека

@@ -9,15 +9,15 @@ import kotlin.test.assertEquals
 internal class UrlTest {
 
     @Test
-    @DisplayName("Конструктор с параметром-строкой выполняет парсинг строкового представления URL-а," +
-            " в случае ошибки парсинга выбрасывает исключение UrlParsingError")
+    @DisplayName(" выполняет парсинг строкового представления URL-а," +
+            " в случае ошибки парсинга выбрасывает исключение MalformedURLException")
     fun case_0() {
         val url1 = "https:/qwerty-123.ru:89/doc/123"
         assertThrows<MalformedURLException> {
-            Url(url1)
+            Url.parse(url1)
         }
         val url2 = "https://qwerty-123.ru:89/doc/123"
-        val actual = Url(url2)
+        val actual = Url.parse(url2)
         assertEquals("qwerty-123.ru", actual.domain)
         assertEquals(89, actual.port)
         assertEquals("/doc/123", actual.document)
@@ -51,7 +51,7 @@ internal class UrlTest {
     @DisplayName("Если указан некорректный документ,выбрасывается исключение")
     fun case_3() {
         assertThrows<java.lang.IllegalArgumentException> {
-            Url(domain = "qwerty.ru", document = "&###", port = 120, protocol = Protocol.HTTP)
+            Url(domain = "qwerty.ru", document = "  ", port = 120, protocol = Protocol.HTTP)
         }
     }
 
@@ -64,11 +64,12 @@ internal class UrlTest {
     }
 
     @Test
-    @DisplayName("Конструктор с параметрами domain, document инициализирует URL c протоколом HTTP и портом 80")
+    @DisplayName("Конструктор с параметрами domain, document,protocol инициализирует URL с портом по умолчанию для переданного протокола")
     fun case_5() {
         val url = Url(
                 domain = "qwerty-123.ru",
-                document = "/doc/123"
+                document = "/doc/123",
+                protocol = Protocol.HTTP
         )
         assertEquals("qwerty-123.ru", url.domain)
         assertEquals(80, url.port)
@@ -82,7 +83,8 @@ internal class UrlTest {
     fun case_6() {
         val url = Url(
                 domain = "qwerty-123.ru",
-                document = "doc/123"
+                document = "doc/123",
+                protocol = Protocol.HTTP
         )
         assertEquals("qwerty-123.ru", url.domain)
         assertEquals(80, url.port)
@@ -95,7 +97,8 @@ internal class UrlTest {
     fun case_7() {
         val url = Url(
                 domain = "qwerty-123.ru",
-                document = "doc/123"
+                document = "doc/123",
+                protocol = Protocol.HTTP
         )
         val expected = "http://qwerty-123.ru/doc/123"
         assertEquals(url.url, expected)
