@@ -1,55 +1,71 @@
 package task_2
 
+// реализовать через односвязный список
+// сделать метод copyFrom
+// cloneable copyable
 class MyStack<T> {
 
-    // реализовать через односвязный список
-    // сделать метод copyFrom
-    // cloneable copyable
-    private var mList = mutableListOf<T>()
+    private var mTop: Item<T>? = null
 
-    // Вталкивание элемента на вершину стека
     fun push(value: T) {
-        mList.add(0, value)
+        mTop = Item(value = value, prev = mTop)
     }
 
-    // Выталкивание элемента с вершины стека
     fun pull() {
-        mList.removeAt(0)
+        if (!isEmpty()) {
+            mTop = mTop?.prev
+        }
     }
 
-    //  Возвращение элемента с вершины стека
-    fun head(): T? {
-        return mList.getOrNull(0)
+    fun top(): T? {
+        return mTop?.value
     }
 
     fun isEmpty(): Boolean {
-        return mList.isEmpty()
+        return mTop == null
     }
 
     fun clear() {
-        mList.clear()
+        mTop = null
+    }
+
+    fun makeCopy(): MyStack<T> {
+        val copy = emptyStackOf<T>()
+        mutableListOf<T>().apply {
+            this@MyStack.forEach(this::add)
+        }.reversed().forEach(copy::push)
+        return copy
     }
 
     override fun toString(): String {
-        return "[${mList.joinToString(",")}]"
+        var prev = mTop
+        var str = "["
+        while (prev != null) {
+            str += "${prev.value}"
+            prev = prev.prev
+            if (prev != null) {
+                str += ","
+            }
+        }
+        str += "]"
+        return str
     }
 
-}
+    private fun forEach(action: (T) -> Unit) {
+        var prev = mTop
+        while (prev != null) {
+            action(prev.value)
+            prev = prev.prev
+        }
+    }
 
+    private data class Item<T>(
+            val value: T,
+            val prev: Item<T>?
+    )
+
+}
 
 fun <T> emptyStackOf(): MyStack<T> {
     return MyStack()
-}
-
-fun main() {
-    val stack1 = MyStack<String>()
-    val stack2 = emptyStackOf<String>()
-    stack2.push("3")
-    stack2.push("2")
-    stack2.push("1")
-    stack2.pull()
-    println(stack2.head())
-
-    println(stack2)
-
 }
