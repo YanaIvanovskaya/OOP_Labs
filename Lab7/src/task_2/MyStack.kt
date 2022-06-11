@@ -1,5 +1,7 @@
 package task_2
 
+import java.util.*
+
 // реализовать через односвязный список
 // сделать метод copyFrom
 // cloneable copyable
@@ -12,9 +14,8 @@ class MyStack<T> {
     }
 
     fun pull() {
-        if (!isEmpty()) {
-            mTop = mTop?.prev
-        }
+        if (isEmpty()) throw EmptyStackException()
+        mTop = mTop?.prev
     }
 
     fun top(): T? {
@@ -29,11 +30,16 @@ class MyStack<T> {
         mTop = null
     }
 
+    //сделать без временного списка
     fun makeCopy(): MyStack<T> {
         val copy = emptyStackOf<T>()
-        mutableListOf<T>().apply {
-            this@MyStack.forEach(this::add)
-        }.reversed().forEach(copy::push)
+
+        mutableListOf<T>()
+                .apply {
+                    this@MyStack.forEach(this::add)
+                }
+                .reversed()
+                .forEach(copy::push)
         return copy
     }
 

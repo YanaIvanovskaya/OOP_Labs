@@ -1,13 +1,13 @@
 package task_1
 
-fun <T> List<T>.findMaxWith(comparator: Comparator<T>): T? {
+fun <T> List<T>.findMaxWith(lessThan: LessThan<T>): T? {
     if (isEmpty()) {
         return null
     }
     var maxValue: T = get(0)
 
     forEach {
-        if (comparator.compare(it, maxValue)) {
+        if (lessThan(it, maxValue)) {
             maxValue = it
         }
     }
@@ -15,6 +15,6 @@ fun <T> List<T>.findMaxWith(comparator: Comparator<T>): T? {
     return maxValue
 }
 
-fun interface Comparator<T> {
-    fun compare(first: T, second: T): Boolean
+fun interface LessThan<T> {
+    operator fun invoke(first: T, second: T): Boolean
 }

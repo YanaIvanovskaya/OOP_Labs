@@ -58,7 +58,7 @@ class Url {
         result = 31 * result + port
         return result
     }
-
+// убрать проверку на пустоту
     private fun String.setSlashInFront() = if (startsWith("/") || isBlank()) this else "/$this"
 
     companion object {

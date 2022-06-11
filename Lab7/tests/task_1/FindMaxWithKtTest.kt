@@ -19,10 +19,10 @@ internal class FindMaxWithKtTest {
             Sportsman("Jack3", 80, 183),
             Sportsman("Jack4", 110, 210)
     )
-    private val comparatorMaxWeight = Comparator { first: Sportsman, second: Sportsman ->
+    private val comparatorMaxWeight = LessThan { first: Sportsman, second: Sportsman ->
         first.weight > second.weight
     }
-    private val comparatorMaxHeight = Comparator { first: Sportsman, second: Sportsman ->
+    private val comparatorMaxHeight = LessThan { first: Sportsman, second: Sportsman ->
         first.height > second.height
     }
 
@@ -35,14 +35,15 @@ internal class FindMaxWithKtTest {
     @Test
     @DisplayName("Не должна изменять список")
     fun case_2() {
-
-
+        val testData2 = testData
+        testData.findMaxWith(comparatorMaxHeight)
+        assertEquals(testData2, testData)
     }
 
     @Test
     @DisplayName("Передача функции Comparator, передача ссылки на функцию, передача лямбды должны работать одинаково")
     fun case_3() {
-        val comparator = Comparator { first: Sportsman, second: Sportsman ->
+        val comparator = LessThan { first: Sportsman, second: Sportsman ->
             first.weight < second.weight
         }
         val expected = Sportsman("Jack3", 80, 183)
@@ -54,17 +55,22 @@ internal class FindMaxWithKtTest {
         assertEquals(expected, testData.findMaxWith { first, second -> first.weight < second.weight })
     }
 
-    @Test
-    @DisplayName("Если есть несколько одинаковых максимальных значений, то возвращается последнее из них")
-    fun case4() {
-        val testData = listOf(
-                Sportsman("Jack1", 90, 180),
-                Sportsman("Jack2", 179, 173),
-                Sportsman("Jack3", 179, 183),
-                Sportsman("Jack4", 179, 210)
-        )
-        val expected = Sportsman("Jack4", 179, 210)
-        assertEquals(expected, testData.findMaxWith(comparatorMaxWeight))
-    }
+//    @Test
+//    @DisplayName("Если в comparator происходит исключение, то оно не перехватывается")
+//    fun case_5() {
+//        val testData = listOf(
+//                Sportsman("Jack1", 90, 180),
+//                Sportsman("Jack2", 179, 173),
+//                Sportsman("Jack3", 179, 183),
+//                Sportsman("Jack4", 179, 210)
+//        )
+//        val comparator = Comparator { first: Sportsman, second: Sportsman ->
+//            5 / 0 == 0
+//            first.weight > second.weight
+//        }
+//        val expected = Sportsman("Jack4", 179, 210)
+//
+//        assertEquals(expected, testData.findMaxWith(comparator))
+//    }
 
 }

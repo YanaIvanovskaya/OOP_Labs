@@ -100,4 +100,5 @@ internal class MyStackTest {
         copy.pull()
         assertEquals(null, copy.top())
     }
+
 }
