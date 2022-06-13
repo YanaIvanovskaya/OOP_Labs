@@ -1,28 +1,64 @@
 class InstructionParser {
 
-    private enum class InstructionRegExp(val regex: Regex) {
-        VARIABLE_ASSIGNMENT("let ${RegExp.IDENTIFIER} = (${RegExp.IDENTIFIER}|${RegExp.NUMBER})".toRegex()),
-        VARIABLE_DECLARATION("var ${RegExp.IDENTIFIER}".toRegex()),
-        FUNCTION_OPERATION("fn ${RegExp.IDENTIFIER} = ${RegExp.IDENTIFIER} ${RegExp.OPERATION} ${RegExp.IDENTIFIER}".toRegex()),
-        FUNCTION_ASSIGNMENT("fn ${RegExp.IDENTIFIER} = ${RegExp.IDENTIFIER}".toRegex()),
-        PRINT("print ${RegExp.IDENTIFIER}".toRegex()),
-        PRINTVARS("printvars".toRegex()),
-        PRINTFNS("printfns".toRegex());
+    @Throws(ParserException::class)
+    fun parse(instruction: String): Instruction {
+        val matchResult = findMatch(instruction)
+        val instructionRegExp = matchResult.first
+        val groups = matchResult.second?.groupValues
+                ?: throw ParserException(ParserErrorType.UNKNOWN_INSTRUCTION)
 
-        private enum class RegExp(val regex: Regex) {
-            IDENTIFIER("""([a-zA-Z][_\w]+)?""".toRegex()),
-            NUMBER("""(-?\d+(\.\d+)?)""".toRegex()),
-            OPERATION("""(\+|-|//|\*)""".toRegex());
-
-            override fun toString() = regex.pattern
+        return when (instructionRegExp) {
+            InstructionRegExp.VARIABLE_ASSIGNMENT -> {
+                val value = groups.getOrThrow(2)
+                Variable(
+                        identifier = groups.getOrThrow(1),
+                        type = Variable.Type.ASSIGNMENT,
+                        value = value.runCatching {
+                            Variable.Value.Number(this.toDouble())
+                        }.getOrElse { Variable.Value.Identifier(value) }
+                )
+            }
+            InstructionRegExp.VARIABLE_DECLARATION -> Variable(
+                    identifier = groups.getOrThrow(1),
+                    type = Variable.Type.DECLARATION,
+                    value = null
+            )
+            InstructionRegExp.FUNCTION_ASSIGNMENT -> Function(
+                    identifier = groups.getOrThrow(1),
+                    operation = null,
+                    operands = listOf(groups.getOrThrow(2))
+            )
+            InstructionRegExp.FUNCTION_OPERATION -> Function(
+                    identifier = groups.getOrThrow(1),
+                    operation = operationFrom(groups.getOrThrow(3)),
+                    operands = listOf(groups.getOrThrow(2), groups.getOrThrow(4))
+            )
+            InstructionRegExp.PRINT -> Print(
+                    identifier = groups.getOrThrow(1)
+            )
+            InstructionRegExp.PRINTVARS -> PrintVars
+            InstructionRegExp.PRINTFNS -> PrintFns
+            else -> throw ParserException(ParserErrorType.UNKNOWN_INSTRUCTION)
         }
     }
 
-    fun parse(instruction: String): Instruction {
+    @Throws(ParserException::class)
+    private fun operationFrom(str: String): Function.Operation {
+        return when (str) {
+            "+" -> Function.Operation.ADDITION
+            "-" -> Function.Operation.SUBTRACTION
+            "/" -> Function.Operation.DIVISION
+            "*" -> Function.Operation.MULTIPLICATION
+            else -> throw ParserException(ParserErrorType.UNSUPPORTED_OPERATION)
+        }
+    }
+
+    private fun findMatch(instruction: String): Pair<InstructionRegExp?, MatchResult?> {
         var matchResult: MatchResult? = null
         var instructionRegExp: InstructionRegExp? = null
+
         InstructionRegExp.values().forEach { regExp ->
-            regExp.regex.matchEntire(instruction).also { result ->
+            regExp.regex.toRegex().matchEntire(instruction).also { result ->
                 if (result != null) {
                     matchResult = result
                     instructionRegExp = regExp
@@ -30,87 +66,30 @@ class InstructionParser {
                 }
             }
         }
-
-        println(matchResult?.groupValues)
-
-        val groups = matchResult?.groupValues ?: throw java.lang.IllegalStateException("")
-
-        val res = when (instructionRegExp) {
-            InstructionRegExp.VARIABLE_ASSIGNMENT -> Instruction.Variable(
-                    identifier = groups.getOrNull(1) ?: "ERROR",
-                    type = Instruction.Variable.Type.ASSIGNMENT,
-                    value = null
-            )
-            InstructionRegExp.VARIABLE_DECLARATION -> Instruction.Variable(
-                    identifier = groups.getOrNull(1) ?: "ERROR",
-                    type = Instruction.Variable.Type.DECLARATION,
-                    value = groups.getOrNull(2)?.runCatching { toDouble() }?.getOrNull()
-            )
-            InstructionRegExp.FUNCTION_ASSIGNMENT -> Instruction.Function(
-                    identifier = "",
-                    operation = null,
-                    operands = listOf(groups.getOrNull(2) ?: "")
-            )
-            InstructionRegExp.FUNCTION_OPERATION -> Instruction.Function(
-                    identifier = groups.getOrNull(1) ?: "ERROR",
-                    operation = operationFrom(groups.getOrNull(3) ?: ""),
-                    operands = listOf(groups.getOrNull(2) ?: "", groups.getOrNull(4) ?: "")
-            )
-            else -> throw java.lang.UnsupportedOperationException("Not done yet")
-        }
-
-        println(res)
-        return Instruction.PrintVars
+        return instructionRegExp to matchResult
     }
 
-    private fun operationFrom(str: String): Instruction.Function.Operation {
-        return when (str) {
-            "+" -> Instruction.Function.Operation.ADDITION
-            "-" -> Instruction.Function.Operation.SUBTRACTION
-            "/" -> Instruction.Function.Operation.DIVISION
-            "*" -> Instruction.Function.Operation.MULTIPLICATION
-            else -> throw java.lang.IllegalStateException()
+    private enum class InstructionRegExp(val regex: String) {
+        VARIABLE_ASSIGNMENT("let ${RegExp.IDENTIFIER} = (${RegExp.IDENTIFIER}|${RegExp.NUMBER})"),
+        VARIABLE_DECLARATION("var ${RegExp.IDENTIFIER}"),
+        FUNCTION_OPERATION("fn ${RegExp.IDENTIFIER} = ${RegExp.IDENTIFIER} ${RegExp.OPERATION} ${RegExp.IDENTIFIER}"),
+        FUNCTION_ASSIGNMENT("fn ${RegExp.IDENTIFIER} = ${RegExp.IDENTIFIER}"),
+        PRINT("print ${RegExp.IDENTIFIER}"),
+        PRINTVARS("printvars"),
+        PRINTFNS("printfns");
+
+        private enum class RegExp(val regex: Regex) {
+            IDENTIFIER("""([a-zA-Z][\w_]+|[a-zA-Z])""".toRegex()),
+            NUMBER("""(-?\d+(\.\d+)?)""".toRegex()),
+            OPERATION("""([+-/*])""".toRegex());
+
+            override fun toString() = regex.pattern
         }
+
     }
 
-}
-
-fun main() {
-    val parser = InstructionParser()
-    parser.parse("var qwer_t3y")
-    parser.parse("let qwerty = -99")
-    parser.parse("let q2_werty = asd")
-    parser.parse("fn qwerty = fggg")
-    parser.parse("fn qwerty = fggg + sweet")
-}
-
-sealed interface Instruction {
-
-    data class Variable(
-            val identifier: String,
-            val value: Double?,
-            val type: Type
-    ) : Instruction {
-        enum class Type {
-            DECLARATION,
-            ASSIGNMENT
-        }
+    private fun List<String>.getOrThrow(index: Int): String {
+        return getOrNull(index) ?: throw ParserException(ParserErrorType.UNKNOWN_INSTRUCTION)
     }
 
-    data class Function(
-            val identifier: String,
-            val operation: Operation?,
-            val operands: List<String>
-    ) : Instruction {
-        enum class Operation {
-            DIVISION,
-            SUBTRACTION,
-            ADDITION,
-            MULTIPLICATION
-        }
-    }
-
-    class Print(val identifier: String) : Instruction
-    object PrintVars : Instruction
-    object PrintFns : Instruction
 }
