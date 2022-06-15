@@ -34,4 +34,8 @@ class CalculatorController(
         }
     }
 
+    fun resetAll() {
+        calculator.clearMemory()
+    }
+
 }

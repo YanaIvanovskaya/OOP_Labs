@@ -1,16 +1,41 @@
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.*
 
-typealias FunctionDataMap = MutableMap<String, Function.Operation>
+data class FunctionData(
+        val identifier: String,
+        val operation: Function.Operation,
+        val repeatCount: Int = 1
+)
+
+typealias FunctionDataMap = MutableMap<String, MutableList<FunctionData>>
+
+private fun MutableList<FunctionData>.addIfNotSame(data: FunctionData) {
+    when {
+        isEmpty() -> add(data)
+        else -> {
+            val lastElement = last()
+            val isLastElementTheSame = lastElement.let {
+                it.identifier == data.identifier && it.operation == data.operation
+            }
+            if (isLastElementTheSame) {
+                this[lastIndex] = lastElement.copy(repeatCount = lastElement.repeatCount + 1)
+            } else {
+                add(data)
+            }
+        }
+    }
+}
 
 class Calculator {
 
     private val mValidator = InstructionValidator()
-    private val mDecimalFormatter = DecimalFormat("#.##")
+    private val mDecimalFormatter = DecimalFormat("#.##", DecimalFormatSymbols(Locale.ENGLISH))
 
     private val mInstructions = mutableListOf<Instruction>()
     private val mVariables = mutableMapOf<String, Variable.Value?>()
     private val mFunctions = mutableListOf<Function>()
-    private val mFunctionData: MutableMap<String, FunctionDataMap> = mutableMapOf()
+    private val mFunctionData: FunctionDataMap = mutableMapOf()
 
     private val String.isVariable
         get() = mVariables.keys.contains(this)
@@ -33,14 +58,14 @@ class Calculator {
     }
 
     private fun calculateFunction(instruction: Function): OutputData? {
-        val data: FunctionDataMap = mutableMapOf()
+        val data = mutableListOf<FunctionData>()
 
         mFunctionData[instruction.identifier] = when (instruction.operation) {
             null -> {
                 val operand = instruction.operands[0]
                 when {
-                    operand.isFunction -> mFunctionData[operand] ?: mutableMapOf()
-                    operand.isVariable -> data.apply { put(operand, Function.Operation.ADDITION) }
+                    operand.isFunction -> mFunctionData[operand] ?: data
+                    operand.isVariable -> data.apply { add(FunctionData(operand, Function.Operation.ADDITION)) }
                     else -> data
                 }
             }
@@ -50,20 +75,20 @@ class Calculator {
 
                 when {
                     firstOperand.isFunction && secondOperand.isFunction -> data.apply {
-                        put(firstOperand, instruction.operation)
-                        put(secondOperand, instruction.operation)
+                        mFunctionData[firstOperand]?.forEach(::add)
+                        addIfNotSame(FunctionData(secondOperand, instruction.operation))
                     }
                     firstOperand.isVariable && secondOperand.isVariable -> data.apply {
-                        put(firstOperand, Function.Operation.ADDITION)
-                        put(secondOperand, instruction.operation)
+                        add(FunctionData(firstOperand, Function.Operation.ADDITION))
+                        addIfNotSame(FunctionData(secondOperand, instruction.operation))
                     }
                     firstOperand.isFunction && secondOperand.isVariable -> data.apply {
-                        put(firstOperand, instruction.operation)
-                        put(secondOperand, instruction.operation)
+                        mFunctionData[firstOperand]?.forEach(::add)
+                        addIfNotSame(FunctionData(secondOperand, instruction.operation))
                     }
                     firstOperand.isVariable && secondOperand.isFunction -> data.apply {
-                        put(firstOperand, Function.Operation.ADDITION)
-                        put(secondOperand, instruction.operation)
+                        add(FunctionData(firstOperand, Function.Operation.ADDITION))
+                        addIfNotSame(FunctionData(secondOperand, instruction.operation))
                     }
                     else -> data
                 }
@@ -78,11 +103,19 @@ class Calculator {
     private fun calculateVariable(instruction: Variable): OutputData? {
         when (instruction.value) {
             is Variable.Value.Identifier -> {
-                var variable = instruction.value.value
-                while (mVariables[variable] is Variable.Value.Identifier) {
-                    variable = (mVariables[variable] as Variable.Value.Identifier).value
+                var identifier = instruction.value.value
+                mVariables[instruction.identifier] = when {
+                    identifier.isVariable -> {
+                        while (mVariables[identifier] is Variable.Value.Identifier) {
+                            identifier = (mVariables[identifier] as Variable.Value.Identifier).value
+                        }
+                        mVariables[identifier]
+                    }
+                    identifier.isFunction -> getFunctionValue(identifier)?.let {
+                        Variable.Value.Number(it)
+                    }
+                    else -> null
                 }
-                mVariables[instruction.identifier] = mVariables[variable]
             }
             else -> mVariables[instruction.identifier] = instruction.value
         }
@@ -104,18 +137,22 @@ class Calculator {
     private fun printFns(): OutputData? {
         return when {
             mFunctions.isEmpty() -> null
-            else -> OutputData(mFunctions.joinToString("") {
-                "${it.identifier} : ${evaluateFunction(it).value}\n"
-            })
+            else -> OutputData(mFunctions.sortedByDescending { it.identifier }
+                    .reversed()
+                    .joinToString("") {
+                        "${it.identifier} : ${evaluateFunction(it).value}\n"
+                    })
         }
     }
 
     private fun printVars(): OutputData? {
         return when {
             mVariables.isEmpty() -> null
-            else -> OutputData(mVariables.map {
-                "${it.key} : ${getVariableValue(it.key)}\n"
-            }.joinToString(""))
+            else -> OutputData(mVariables.keys.sortedDescending()
+                    .reversed()
+                    .joinToString("") {
+                        "$it : ${mDecimalFormatter.format(getVariableValue(it))}\n"
+                    })
         }
     }
 
@@ -132,15 +169,19 @@ class Calculator {
             }
         }
 
-        for (entry in data) {
-            val name = entry.key
-            val operation = entry.value
+        for (elem in data) {
+            val name = elem.identifier
+            val operation = elem.operation
             val operand = when {
                 name.isVariable -> getVariableValue(name)
                 name.isFunction -> getFunctionValue(name)
                 else -> null
             }
-            operand?.let { calc(it, operation) } ?: return null
+            operand ?: return null
+
+            repeat(elem.repeatCount) {
+                calc(operand, operation)
+            }
         }
 
         return value
@@ -187,6 +228,9 @@ class Calculator {
 
     fun clearMemory() {
         mInstructions.clear()
+        mFunctions.clear()
+        mVariables.clear()
+        mFunctionData.clear()
     }
 
     data class OutputData(val value: String)

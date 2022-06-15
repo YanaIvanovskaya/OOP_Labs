@@ -33,7 +33,7 @@ class InstructionValidator {
     }
 
     private fun ensureSemantic(instruction: Instruction) {
-        val invalidIdentifiers = """(val|let)""".toRegex()
+        val invalidIdentifiers = """(val|let|fn)""".toRegex()
         val hasInvalidIdentifier = when (instruction) {
             is Variable -> instruction.identifier.matches(invalidIdentifiers)
             is Function -> instruction.identifier.matches(invalidIdentifiers)
