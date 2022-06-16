@@ -2,7 +2,8 @@ class InstructionParser {
 
     @Throws(ParserException::class)
     fun parse(instruction: String): Instruction {
-        val matchResult = findMatch(instruction)
+//        println("instruction $instruction")
+        val matchResult = findMatch(instruction.trim())
         val instructionRegExp = matchResult.first
         val groups = matchResult.second?.groupValues
                 ?: throw ParserException(ParserErrorType.UNKNOWN_INSTRUCTION)
@@ -70,10 +71,10 @@ class InstructionParser {
     }
 
     private enum class InstructionRegExp(val regex: String) {
-        VARIABLE_ASSIGNMENT("let ${RegExp.IDENTIFIER} = (${RegExp.IDENTIFIER}|${RegExp.NUMBER})"),
+        VARIABLE_ASSIGNMENT("let ${RegExp.IDENTIFIER}=(${RegExp.IDENTIFIER}|${RegExp.NUMBER})"),
         VARIABLE_DECLARATION("var ${RegExp.IDENTIFIER}"),
-        FUNCTION_OPERATION("fn ${RegExp.IDENTIFIER} = ${RegExp.IDENTIFIER} ${RegExp.OPERATION} ${RegExp.IDENTIFIER}"),
-        FUNCTION_ASSIGNMENT("fn ${RegExp.IDENTIFIER} = ${RegExp.IDENTIFIER}"),
+        FUNCTION_OPERATION("fn ${RegExp.IDENTIFIER}=${RegExp.IDENTIFIER}${RegExp.OPERATION}${RegExp.IDENTIFIER}"),
+        FUNCTION_ASSIGNMENT("fn ${RegExp.IDENTIFIER}=${RegExp.IDENTIFIER}"),
         PRINT("print ${RegExp.IDENTIFIER}"),
         PRINTVARS("printvars"),
         PRINTFNS("printfns");
@@ -89,7 +90,12 @@ class InstructionParser {
     }
 
     private fun List<String>.getOrThrow(index: Int): String {
-        return getOrNull(index) ?: throw ParserException(ParserErrorType.UNKNOWN_INSTRUCTION)
+        val element = getOrNull(index)
+        if (element == null) {
+            println("getOrThrow - match group not found")
+            throw ParserException(ParserErrorType.UNKNOWN_INSTRUCTION)
+        } else return element
+        //return getOrNull(index) ?: throw ParserException(ParserErrorType.UNKNOWN_INSTRUCTION)
     }
 
 }

@@ -6,6 +6,7 @@ class CalculatorController(
 ) {
 
     fun calculate(instruction: String) {
+        if (instruction.isEmpty()) return
         try {
             val result = calculator.calculate(parser.parse(instruction))
             if (result != null) {
@@ -25,7 +26,7 @@ class CalculatorController(
         }
     }
 
-    fun start() {
+    fun startCalculate() {
         Scanner(System.`in`).use {
             println("Enter instructions to calculate:")
             while (it.hasNextLine()) {

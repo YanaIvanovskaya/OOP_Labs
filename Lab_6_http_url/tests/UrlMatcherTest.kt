@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import java.net.MalformedURLException
 
 internal class UrlMatcherTest {
+
     @Test
     @DisplayName("Попытка получить информацию у некорректного урла должна приводить к исключению")
     fun case_1() {
@@ -46,15 +47,6 @@ internal class UrlMatcherTest {
     }
 
     @Test
-    @DisplayName("Если порт не находится в диапазоне [1;65535], то урл некорректен")
-    fun case_4() {
-        val url = "http://qwerty.ru:65888/document/12/23"
-        assertThrows(MalformedURLException::class.java) {
-            UrlMatcher.getUrl(url)
-        }
-    }
-
-    @Test
     @DisplayName("Если у урла протокол не HTTP/HTTPS/FTP, то урл некорректен")
     fun case_5() {
         val url = "ws://qwerty.ru:345/document/12/23"
@@ -83,12 +75,28 @@ internal class UrlMatcherTest {
     @DisplayName("Валидный урл может иметь порт, равный 1 или 65535")
     fun case_8() {
         val url1 = "https://qwerty.dev:1"
-        val expected1 = Url(protocol = Protocol.HTTPS, domain = "qwerty.dev", port = 1, document = "")
+        val expected1 = Url(protocol = Protocol.HTTPS, domain = "qwerty.dev", port = LOWER_BOUND, document = "")
         assertEquals(expected1, UrlMatcher.getUrl(url1))
 
         val url2 = "https://qwerty.dev:65535"
-        val expected2 = Url(protocol = Protocol.HTTPS, domain = "qwerty.dev", port = 65535, document = "")
+        val expected2 = Url(protocol = Protocol.HTTPS, domain = "qwerty.dev", port = UPPER_BOUND, document = "")
         assertEquals(expected2, UrlMatcher.getUrl(url2))
+    }
+
+    @Test
+    @DisplayName("Если порт не находится в диапазоне [1;65535], то урл некорректен")
+    fun case_4() {
+        val url1 = "http://qwerty.ru:65536/document/12/23"
+        val url2 = "http://qwerty.ru:0/document/12/23"
+        val url3 = "http://qwerty.ru:65535/document/12/23"
+        assertDoesNotThrow {
+            UrlMatcher.getUrl(url3)
+        }
+        assertThrows(MalformedURLException::class.java) {
+            val res = UrlMatcher.getUrl(url1).port
+            if (res !in LOWER_BOUND..UPPER_BOUND) fail<Any>()
+            UrlMatcher.getUrl(url2)
+        }
     }
 
     @Test
@@ -138,7 +146,11 @@ internal class UrlMatcherTest {
         val url1 = "https://qwerty.dev/"
         val expected1 = Url(protocol = Protocol.HTTPS, domain = "qwerty.dev", port = 443, document = "/")
         assertEquals(expected1, UrlMatcher.getUrl(url1))
+    }
 
+    companion object {
+        private const val UPPER_BOUND = 65535
+        private const val LOWER_BOUND = 1
     }
 
 }

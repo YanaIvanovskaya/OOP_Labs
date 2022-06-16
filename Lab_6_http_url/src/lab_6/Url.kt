@@ -58,8 +58,9 @@ class Url {
         result = 31 * result + port
         return result
     }
-// убрать проверку на пустоту
-    private fun String.setSlashInFront() = if (startsWith("/") || isBlank()) this else "/$this"
+
+    // убрать проверку на пустоту
+    private fun String.setSlashInFront() = if (startsWith("/")) this else "/$this"
 
     companion object {
         fun parse(url: String): Url = UrlMatcher.getUrl(url)

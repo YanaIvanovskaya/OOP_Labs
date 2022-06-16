@@ -2,6 +2,7 @@ package vehicle.interfaces
 
 interface IPerson {
     val name: String
+    fun sayHello()
 }
 
 interface IRacer : IPerson {

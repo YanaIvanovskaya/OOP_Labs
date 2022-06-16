@@ -162,5 +162,11 @@ internal class CarTest {
             taxi.addPassenger(taxiDriver)
         }
     }
+    @Test
+    fun test() {
+        val name = "Q"
+        println("Hello $name")
+        println("Hello \$name")
+    }
 
 }

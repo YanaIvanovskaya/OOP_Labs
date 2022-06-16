@@ -45,7 +45,7 @@ object UrlMatcher {
     }
 
     private fun isPortValid(port: Int): Boolean {
-        return port in 0..65536//добавить тест +-1
+        return port in 1..65535//добавить тест +-1
     }
 
     private fun getProtocolRegexStr(): String {

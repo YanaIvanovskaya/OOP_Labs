@@ -39,7 +39,7 @@ internal class InstructionParserTest {
 
     @Test
     fun `parsing let identifier = identifier`() {
-        val instruction = "let qwerty_12 = some_other_variable"
+        val instruction = "let qwerty_12=some_other_variable"
         val expected = Variable(
                 identifier = "qwerty_12",
                 value = Variable.Value.Identifier("some_other_variable"),
@@ -50,7 +50,7 @@ internal class InstructionParserTest {
 
     @Test
     fun `parsing let identifier = number`() {
-        val instruction = "let qwerty_12 = -128.345"
+        val instruction = "let qwerty_12=-128.345"
         val expected = Variable(
                 identifier = "qwerty_12",
                 value = Variable.Value.Number(-128.345),
@@ -61,7 +61,7 @@ internal class InstructionParserTest {
 
     @Test
     fun `parsing fn identifier = identifier`() {
-        val instruction = "fn FN_13 = qwerty"
+        val instruction = "fn FN_13=qwerty"
         val expected = Function(
                 identifier = "FN_13",
                 operands = listOf("qwerty"),
@@ -72,7 +72,7 @@ internal class InstructionParserTest {
 
     @Test
     fun `parsing fn identifier = identifier operation identifier`() {
-        val instruction = "fn FN_13 = qwerty / some_variable"
+        val instruction = "fn FN_13=qwerty/some_variable"
         val expected = Function(
                 identifier = "FN_13",
                 operands = listOf("qwerty", "some_variable"),
